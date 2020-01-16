@@ -1,0 +1,22 @@
+[modules]
+  [modules.preprocessor]
+    name = "print.PrintPre"
+    path = "build/classes/java/modules/print/PrintPre.class"
+  [modules.processor]
+    name = "print.PrintProcessor"
+    path = "build/classes/java/modules/print/PrintProcessor.class"
+  [modules.postprocessor]
+    name = "print.PrintPost"
+    path = "build/classes/java/modules/print/PrintPost.class"
+  [modules.injector]
+    name = "print.PrintInjector"
+    path = "/path/to/injector"
+
+[common]
+  concurrency = 4
+  run_for_sec = 100
+  ramp_for_sec = 10
+
+[print_test]
+  title = "Print test"
+  num = 10
