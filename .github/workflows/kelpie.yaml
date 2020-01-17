@@ -25,5 +25,11 @@ jobs:
     - name: Build Kelpie
       run: ./gradlew build
 
-    - name: Build other modules
+    - name: Build sample modules
       run: ./gradlew modules
+
+    - name: Test a sample
+      run: |
+        ./gradlew installDist
+        ./gradlew modules
+        ./build/install/kelpie/bin/kelpie --config conf/print.toml

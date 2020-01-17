@@ -55,10 +55,10 @@ public class ModuleLoader extends ClassLoader {
   }
 
   private Module loadModule(String className, String classPath) throws ModuleLoadException {
-    try {
-      checkNotNull(className);
-      checkNotNull(classPath);
+    checkNotNull(className);
+    checkNotNull(classPath);
 
+    try {
       byte[] byteCode = load(classPath);
 
       Class<Module> clazz = (Class<Module>) defineClass(className, byteCode, 0, byteCode.length);
