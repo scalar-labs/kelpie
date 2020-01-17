@@ -9,5 +9,5 @@ public abstract class PostProcessor implements Module {
     this.config = config;
   }
 
-  public abstract boolean postProcess();
+  public abstract void execute();
 }

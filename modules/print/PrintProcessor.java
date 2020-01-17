@@ -6,7 +6,7 @@ import com.scalar.kelpie.modules.Processor;
 public class PrintProcessor extends Processor {
 
   @Override
-  public void process() {
+  public void execute() {
     Toml toml = config.getToml().getTable("print_test");
     Long num = 1L;
     if (toml.getLong("num") != null) {

@@ -6,7 +6,7 @@ import com.scalar.kelpie.modules.PostProcessor;
 public class PrintPost extends PostProcessor {
 
   @Override
-  public boolean postProcess() {
+  public void execute() {
     Toml toml = config.getToml().getTable("print_test");
     String title = toml.getString("title");
     Long num = 1L;
@@ -18,6 +18,5 @@ public class PrintPost extends PostProcessor {
     System.out.println("Run for " + num + " seconds");
 
     // always succeed
-    return true;
   }
 }

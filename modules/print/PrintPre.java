@@ -8,7 +8,7 @@ public class PrintPre extends PreProcessor {
   private Long num = 1L;
 
   @Override
-  public void preProcess() {
+  public void execute() {
     Toml toml = config.getToml().getTable("print_test");
     title = toml.getString("title");
     if (toml.getLong("num") != null) {

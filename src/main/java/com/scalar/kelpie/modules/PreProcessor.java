@@ -9,5 +9,5 @@ public abstract class PreProcessor implements Module {
     this.config = config;
   }
 
-  public abstract void preProcess();
+  public abstract void execute();
 }

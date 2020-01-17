@@ -9,5 +9,5 @@ public abstract class Processor implements Module {
     this.config = config;
   }
 
-  public abstract void process();
+  public abstract void execute();
 }

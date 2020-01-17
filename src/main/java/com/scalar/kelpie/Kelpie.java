@@ -1,5 +1,9 @@
 package com.scalar.kelpie;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.scalar.kelpie.config.Config;
+import java.io.File;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
 
@@ -42,28 +46,24 @@ public class Kelpie implements Callable {
 
   @Override
   public Void call() {
-    boolean doPre = true;
-    boolean doProcess = true;
-    boolean doPost = true;
-
     if ((onlyPre && onlyProcess) || (onlyPre && onlyPost) || (onlyProcess && onlyPost)) {
       throw new IllegalArgumentException("You can use only one of --only-* options at once");
     }
 
+    Config config = new Config(new File(configPath));
     if (onlyPre) {
-      doProcess = false;
-      doPost = false;
-    }
-    if (onlyProcess) {
-      doPre = false;
-      doPost = false;
-    }
-    if (onlyPost) {
-      doPre = false;
-      doProcess = false;
+      config.enablePreProcessor();
+    } else if (onlyProcess) {
+      config.enableProcessor();
+    } else if (onlyPost) {
+      config.enablePostProcessor();
+    } else {
+      config.enableAllProcessors();
     }
 
-    KelpieExecutor executor = new KelpieExecutor(configPath, doPre, doProcess, doPost);
+    Injector injector = Guice.createInjector(new KelpieModule(config));
+    KelpieExecutor executor = injector.getInstance(KelpieExecutor.class);
+
     executor.execute();
 
     return null;

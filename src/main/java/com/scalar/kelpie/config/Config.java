@@ -17,6 +17,10 @@ public class Config {
   private Optional<String> processorPath;
   private Optional<String> postProcessorPath;
   private Optional<String> injectorPath;
+  private boolean preProcessorEnabled = false;
+  private boolean processorEnabled = false;
+  private boolean postProcessorEnabled = false;
+  private boolean injectorEnabled = false;
 
   private Long concurrency = 1L;
   private Long runForSec = 60L;
@@ -81,6 +85,44 @@ public class Config {
 
   public Long getRampForSet() {
     return rampForSec;
+  }
+
+  public boolean isPreProcessorEnabled() {
+    return preProcessorEnabled;
+  }
+
+  public boolean isProcessorEnabled() {
+    return processorEnabled;
+  }
+
+  public boolean isPostProcessorEnabled() {
+    return postProcessorEnabled;
+  }
+
+  public boolean isInjectorEnabled() {
+    return injectorEnabled;
+  }
+
+  public void enablePreProcessor() {
+    preProcessorEnabled = true;
+  }
+
+  public void enableProcessor() {
+    processorEnabled = true;
+  }
+
+  public void enablePostProcessor() {
+    postProcessorEnabled = true;
+  }
+
+  public void enableInjector() {
+    injectorEnabled = true;
+  }
+
+  public void enableAllProcessors() {
+    enablePreProcessor();
+    enableProcessor();
+    enablePostProcessor();
   }
 
   private void loadCommon() {

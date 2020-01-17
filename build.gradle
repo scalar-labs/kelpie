@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
     compile group: 'com.google.guava', name: 'guava', version: '24.1-jre'
     compile group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
     compile group: 'info.picocli', name: 'picocli', version: '4.1.4'
