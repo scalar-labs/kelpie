@@ -8,9 +8,9 @@
   [modules.postprocessor]
     name = "print.PrintPost"
     path = "build/classes/java/modules/print/PrintPost.class"
-  [modules.injector]
+  [[modules.injectors]]
     name = "print.PrintInjector"
-    path = "/path/to/injector"
+    path = "build/classes/java/modules/print/PrintInjector.class"
 
 [common]
   concurrency = 4

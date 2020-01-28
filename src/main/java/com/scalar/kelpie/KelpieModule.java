@@ -9,6 +9,7 @@ import com.scalar.kelpie.modules.ModuleLoader;
 import com.scalar.kelpie.modules.PostProcessor;
 import com.scalar.kelpie.modules.PreProcessor;
 import com.scalar.kelpie.modules.Processor;
+import java.util.List;
 
 public class KelpieModule extends AbstractModule {
   private final ModuleLoader loader;
@@ -33,7 +34,7 @@ public class KelpieModule extends AbstractModule {
   }
 
   @Provides
-  Injector provideInjector() throws ModuleLoadException {
-    return loader.loadInjector();
+  List<Injector> provideInjectors() throws ModuleLoadException {
+    return loader.loadInjectors();
   }
 }

@@ -8,9 +8,12 @@
   [modules.postprocessor]
     name = "org.my.Checker"
     path = "/path/to/checker"
-  [modules.injector]
-    name = "org.my.Injector"
-    path = "/path/to/injector"
+  [[modules.injectors]]
+    name = "org.my.Injector1"
+    path = "/path/to/injector1"
+  [[modules.injectors]]
+    name = "org.my.Injector2"
+    path = "/path/to/injector2"
 
 [common]
   concurrency = 4

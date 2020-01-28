@@ -15,7 +15,8 @@ public class PrintProcessor extends Processor {
 
     for (int i = 0; i < num; i++) {
       try {
-        System.out.println("Runnning... " + i);
+        long id = Thread.currentThread().getId();
+        System.out.println("[thread " + id + "] Runnning... " + i);
         Thread.sleep(1000);
       } catch (InterruptedException e) {
         // ignore

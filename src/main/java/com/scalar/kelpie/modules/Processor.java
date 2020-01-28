@@ -10,4 +10,8 @@ public abstract class Processor implements Module {
   }
 
   public abstract void execute();
+
+  public Config getConfig() {
+    return config;
+  }
 }

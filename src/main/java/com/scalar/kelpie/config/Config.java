@@ -2,6 +2,8 @@ package com.scalar.kelpie.config;
 
 import com.moandjiezana.toml.Toml;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.concurrent.Immutable;
 
@@ -12,19 +14,18 @@ public class Config {
   private Optional<String> preProcessorName;
   private Optional<String> processorName;
   private Optional<String> postProcessorName;
-  private Optional<String> injectorName;
   private Optional<String> preProcessorPath;
   private Optional<String> processorPath;
   private Optional<String> postProcessorPath;
-  private Optional<String> injectorPath;
+  private final Map<String, String> injectors = new HashMap<String, String>();
   private boolean preProcessorEnabled = false;
   private boolean processorEnabled = false;
   private boolean postProcessorEnabled = false;
   private boolean injectorEnabled = false;
 
-  private Long concurrency = 1L;
-  private Long runForSec = 60L;
-  private Long rampForSec = 0L;
+  private int concurrency = 1;
+  private int runForSec = 60;
+  private int rampForSec = 0;
 
   public Config(String tomlText) {
     this(new Toml().read(tomlText));
@@ -55,10 +56,6 @@ public class Config {
     return postProcessorName;
   }
 
-  public Optional<String> getInjectorName() {
-    return injectorName;
-  }
-
   public Optional<String> getPreProcessorPath() {
     return preProcessorPath;
   }
@@ -71,19 +68,19 @@ public class Config {
     return postProcessorPath;
   }
 
-  public Optional<String> getInjectorPath() {
-    return injectorPath;
+  public Map<String, String> getInjectors() {
+    return injectors;
   }
 
-  public Long getConcurrency() {
+  public int getConcurrency() {
     return concurrency;
   }
 
-  public Long getRunForSec() {
+  public int getRunForSec() {
     return runForSec;
   }
 
-  public Long getRampForSet() {
+  public int getRampForSec() {
     return rampForSec;
   }
 
@@ -130,21 +127,26 @@ public class Config {
     preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
     processorName = Optional.ofNullable(modules.getString("processor.name"));
     postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
-    injectorName = Optional.ofNullable(modules.getString("injector.name"));
     preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
     processorPath = Optional.ofNullable(modules.getString("processor.path"));
     postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
-    injectorPath = Optional.ofNullable(modules.getString("injector.path"));
+
+    modules
+        .getTables("injectors")
+        .forEach(
+            i -> {
+              injectors.put(i.getString("name"), i.getString("path"));
+            });
 
     Toml common = toml.getTable("common");
     if (common.getLong("concurrency") != null) {
-      concurrency = common.getLong("concurrency");
+      concurrency = new Integer(common.getLong("concurrency").toString());
     }
     if (common.getLong("run_for_sec") != null) {
-      runForSec = common.getLong("run_for_sec");
+      runForSec = new Integer(common.getLong("run_for_sec").toString());
     }
     if (common.getLong("run_for_sec") != null) {
-      rampForSec = common.getLong("ramp_for_sec");
+      rampForSec = new Integer(common.getLong("ramp_for_sec").toString());
     }
   }
 }
