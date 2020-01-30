@@ -12,10 +12,17 @@ import com.scalar.kelpie.modules.Processor;
 import java.util.List;
 
 public class KelpieModule extends AbstractModule {
+  private final Config config;
   private final ModuleLoader loader;
 
   public KelpieModule(Config config) {
+    this.config = config;
     this.loader = new ModuleLoader(config);
+  }
+
+  @Provides
+  Config provideConfig() {
+    return config;
   }
 
   @Provides

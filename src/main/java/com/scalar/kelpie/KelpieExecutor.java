@@ -1,6 +1,7 @@
 package com.scalar.kelpie;
 
 import com.google.inject.Inject;
+import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.Injector;
 import com.scalar.kelpie.modules.PostProcessor;
 import com.scalar.kelpie.modules.PreProcessor;
@@ -17,6 +18,7 @@ import javax.annotation.concurrent.Immutable;
 
 @Immutable
 public class KelpieExecutor {
+  private final Config config;
   private final PreProcessor preProcessor;
   private final Processor processor;
   private final PostProcessor postProcessor;
@@ -26,10 +28,12 @@ public class KelpieExecutor {
 
   @Inject
   public KelpieExecutor(
+      Config config,
       PreProcessor preProcessor,
       Processor processor,
       PostProcessor postProcessor,
       List<Injector> injectors) {
+    this.config = config;
     this.preProcessor = preProcessor;
     this.processor = processor;
     this.postProcessor = postProcessor;
@@ -55,7 +59,7 @@ public class KelpieExecutor {
   }
 
   private void executeConcurrently() {
-    int concurrency = processor.getConfig().getConcurrency();
+    int concurrency = config.getConcurrency();
     ExecutorService es = Executors.newFixedThreadPool(concurrency + 1);
     List<CompletableFuture> futures = new ArrayList<>();
 

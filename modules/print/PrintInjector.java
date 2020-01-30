@@ -9,7 +9,7 @@ public class PrintInjector extends Injector {
 
   @Override
   public void initialize(Config config) {
-    this.config = config;
+    super.initialize(config);
     this.random = new Random(System.currentTimeMillis());
   }
 
