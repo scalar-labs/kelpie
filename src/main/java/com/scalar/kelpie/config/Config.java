@@ -1,8 +1,10 @@
 package com.scalar.kelpie.config;
 
 import com.moandjiezana.toml.Toml;
+import com.scalar.kelpie.exception.IllegalConfigException;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.concurrent.Immutable;
@@ -11,12 +13,12 @@ import javax.annotation.concurrent.Immutable;
 public class Config {
   private final Toml toml;
 
-  private Optional<String> preProcessorName;
-  private Optional<String> processorName;
-  private Optional<String> postProcessorName;
-  private Optional<String> preProcessorPath;
-  private Optional<String> processorPath;
-  private Optional<String> postProcessorPath;
+  private Optional<String> preProcessorName = Optional.empty();
+  private Optional<String> processorName = Optional.empty();
+  private Optional<String> postProcessorName = Optional.empty();
+  private Optional<String> preProcessorPath = Optional.empty();
+  private Optional<String> processorPath = Optional.empty();
+  private Optional<String> postProcessorPath = Optional.empty();
   private final Map<String, String> injectors = new HashMap<String, String>();
   private boolean preProcessorEnabled = false;
   private boolean processorEnabled = false;
@@ -124,29 +126,41 @@ public class Config {
 
   private void loadCommon() {
     Toml modules = toml.getTable("modules");
-    preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
-    processorName = Optional.ofNullable(modules.getString("processor.name"));
-    postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
-    preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
-    processorPath = Optional.ofNullable(modules.getString("processor.path"));
-    postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
+    if (modules != null) {
+      preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
+      processorName = Optional.ofNullable(modules.getString("processor.name"));
+      postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
+      preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
+      processorPath = Optional.ofNullable(modules.getString("processor.path"));
+      postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
 
-    modules
-        .getTables("injectors")
-        .forEach(
+      List<Toml> injectorsTable = modules.getTables("injectors");
+      if (injectorsTable != null) {
+        injectorsTable.forEach(
             i -> {
               injectors.put(i.getString("name"), i.getString("path"));
             });
+      }
+    }
 
     Toml common = toml.getTable("common");
     if (common.getLong("concurrency") != null) {
       concurrency = new Integer(common.getLong("concurrency").toString());
+      if (concurrency <= 0) {
+        throw new IllegalConfigException("common.concurrency should be positive");
+      }
     }
     if (common.getLong("run_for_sec") != null) {
       runForSec = new Integer(common.getLong("run_for_sec").toString());
+      if (runForSec <= 0) {
+        throw new IllegalConfigException("common.run_for_sec should be positive");
+      }
     }
     if (common.getLong("run_for_sec") != null) {
       rampForSec = new Integer(common.getLong("ramp_for_sec").toString());
+      if (rampForSec <= 0) {
+        throw new IllegalConfigException("common.ramp_for_sec should be positive");
+      }
     }
   }
 }

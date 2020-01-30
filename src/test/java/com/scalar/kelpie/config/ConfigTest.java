@@ -3,6 +3,7 @@ package com.scalar.kelpie.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.scalar.kelpie.exception.IllegalConfigException;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
@@ -106,6 +107,16 @@ public class ConfigTest {
 
     // Assert
     assertThat(concurrency).isEqualTo(ANY_CONCURRENCY);
+  }
+
+  @Test
+  public void getConcurrency_NegativeValueGiven_ShouldThrowIllegalConfigException() {
+    // Act Assert
+    assertThatThrownBy(
+            () -> {
+              new Config("[common]\n" + "concurrency = -1");
+            })
+        .isInstanceOf(IllegalConfigException.class);
   }
 
   @Test
