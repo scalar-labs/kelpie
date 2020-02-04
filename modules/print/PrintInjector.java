@@ -34,6 +34,6 @@ public class PrintInjector extends Injector {
       // ignore
     }
 
-    System.out.println("[Injector] Dummy enjection");
+    System.out.println("[Injector] Dummy ejection");
   }
 }

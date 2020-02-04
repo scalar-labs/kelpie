@@ -3,6 +3,7 @@ package com.scalar.kelpie;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.executor.KelpieExecutor;
 import java.io.File;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;

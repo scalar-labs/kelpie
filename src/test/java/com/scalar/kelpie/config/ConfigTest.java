@@ -16,6 +16,7 @@ public class ConfigTest {
   static final String ANY_INJECTOR1_PATH = "/path/to/Injectro1";
   static final String ANY_INJECTOR2_NAME = "my.Injector2";
   static final String ANY_INJECTOR2_PATH = "/path/to/Injector2";
+  static final String ANY_INECTION_EXECUTOR = "com.scalar.kelpie.executor.Test";
   static final int ANY_CONCURRENCY = 8;
   static final String ANY_ADDITIONAL_CONFIG = "my_config";
   static final String ANY_PARAMETER = "my_parameter";
@@ -141,6 +142,30 @@ public class ConfigTest {
 
     // Assert
     assertThat(parameter).isEqualTo(ANY_VALUE);
+  }
+
+  @Test
+  public void getInjectionExecutor_ShouldGetDefaultExecutor() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    String executor = config.getInjectionExecutor().get();
+
+    // Assert
+    assertThat(executor).isEqualTo("com.scalar.kelpie.executor.RandomInjectionExecutor");
+  }
+
+  @Test
+  public void getInjectionExecutor_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config("[common]\n" + "injection_executor = \"" + ANY_INECTION_EXECUTOR + "\"");
+
+    // Act
+    String executor = config.getInjectionExecutor().get();
+
+    // Assert
+    assertThat(executor).isEqualTo(ANY_INECTION_EXECUTOR);
   }
 
   @Test

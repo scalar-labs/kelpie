@@ -19,6 +19,7 @@
   concurrency = 4
   run_for_sec = 100
   ramp_for_sec = 10
+  injection_executor = "com.scalar.kelpie.executor.RandomInjectionExecutor"
 
 [my_test_config]
   accounts = 10000

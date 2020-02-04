@@ -11,6 +11,8 @@ import javax.annotation.concurrent.Immutable;
 
 @Immutable
 public class Config {
+  private final String DEFAULT_INJECTION_EXECUTOR =
+      "com.scalar.kelpie.executor.RandomInjectionExecutor";
   private final Toml toml;
 
   private Optional<String> preProcessorName = Optional.empty();
@@ -19,6 +21,7 @@ public class Config {
   private Optional<String> preProcessorPath = Optional.empty();
   private Optional<String> processorPath = Optional.empty();
   private Optional<String> postProcessorPath = Optional.empty();
+  private Optional<String> injectionExecutor = Optional.empty();
   private final Map<String, String> injectors = new HashMap<String, String>();
   private boolean preProcessorEnabled = false;
   private boolean processorEnabled = false;
@@ -84,6 +87,10 @@ public class Config {
 
   public int getRampForSec() {
     return rampForSec;
+  }
+
+  public Optional<String> getInjectionExecutor() {
+    return injectionExecutor;
   }
 
   public boolean isPreProcessorEnabled() {
@@ -161,6 +168,11 @@ public class Config {
       if (rampForSec <= 0) {
         throw new IllegalConfigException("common.ramp_for_sec should be positive");
       }
+    }
+    if (common.getString("injection_executor") != null) {
+      injectionExecutor = Optional.of(common.getString("injection_executor"));
+    } else {
+      injectionExecutor = Optional.of(DEFAULT_INJECTION_EXECUTOR);
     }
   }
 }
