@@ -25,7 +25,7 @@ public class ModuleLoader extends ClassLoader {
       return (PreProcessor)
           loadModule(config.getPreProcessorName().get(), config.getPreProcessorPath().get());
     } else {
-      return new DummyPreProcessor();
+      return new DummyPreProcessor(config);
     }
   }
 
@@ -34,7 +34,7 @@ public class ModuleLoader extends ClassLoader {
       return (Processor)
           loadModule(config.getProcessorName().get(), config.getProcessorPath().get());
     } else {
-      return new DummyProcessor();
+      return new DummyProcessor(config);
     }
   }
 
@@ -43,7 +43,7 @@ public class ModuleLoader extends ClassLoader {
       return (PostProcessor)
           loadModule(config.getPostProcessorName().get(), config.getPostProcessorPath().get());
     } else {
-      return new DummyPostProcessor();
+      return new DummyPostProcessor(config);
     }
   }
 
@@ -70,10 +70,10 @@ public class ModuleLoader extends ClassLoader {
       byte[] byteCode = load(classPath);
 
       Class<Module> clazz = (Class<Module>) defineClass(className, byteCode, 0, byteCode.length);
+      Class[] types = {Config.class};
+      Object[] args = {config};
 
-      Module module = clazz.getConstructor().newInstance();
-      module.initialize(config);
-      return module;
+      return clazz.getConstructor(types).newInstance(args);
     } catch (Exception e) {
       throw new ModuleLoadException(
           "Failed to load a module " + className + " from " + classPath, e);

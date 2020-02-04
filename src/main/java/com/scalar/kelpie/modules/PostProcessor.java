@@ -5,7 +5,7 @@ import com.scalar.kelpie.config.Config;
 public abstract class PostProcessor implements Module {
   protected Config config;
 
-  public void initialize(Config config) {
+  public PostProcessor(Config config) {
     this.config = config;
   }
 

@@ -7,9 +7,8 @@ import java.util.Random;
 public class PrintInjector extends Injector {
   private Random random;
 
-  @Override
-  public void initialize(Config config) {
-    super.initialize(config);
+  public PrintInjector(Config config) {
+    super(config);
     this.random = new Random(System.currentTimeMillis());
   }
 

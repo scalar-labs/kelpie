@@ -1,9 +1,14 @@
 package print;
 
 import com.moandjiezana.toml.Toml;
+import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.Processor;
 
 public class PrintProcessor extends Processor {
+
+  public PrintProcessor(Config config) {
+    super(config);
+  }
 
   @Override
   public void execute() {
