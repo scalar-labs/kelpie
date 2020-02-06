@@ -2,11 +2,10 @@ package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
 
-public abstract class PostProcessor implements Module {
-  protected Config config;
+public abstract class PostProcessor extends Module {
 
   public PostProcessor(Config config) {
-    this.config = config;
+    super(config);
   }
 
   public abstract void execute();

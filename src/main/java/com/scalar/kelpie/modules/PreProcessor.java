@@ -2,11 +2,10 @@ package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
 
-public abstract class PreProcessor implements Module {
-  protected Config config;
+public abstract class PreProcessor extends Module {
 
   public PreProcessor(Config config) {
-    this.config = config;
+    super(config);
   }
 
   public abstract void execute();
