@@ -84,9 +84,9 @@ public class PrintProcessor extends Processor {
 
   @Override
   public void execute() {
-    int num = config.getUserInteger("print_test", "num");
+    long num = config.getUserLong("print_test", "num");
 
-    for (int i = 0; i < num; i++) {
+    for (long i = 0; i < num; i++) {
       try {
         long id = Thread.currentThread().getId();
         System.out.println("[thread " + id + "] Runnning... " + i);
@@ -118,7 +118,7 @@ public class PrintPost extends PostProcessor {
   @Override
   public void execute() {
     String = config.getUserString("print_test", "title");
-    int num = config.getUserInteger("print_test", "num");
+    int num = config.getUserLong("print_test", "num");
 
     System.out.println("Checking for " + title);
     System.out.println("Run for " + num + " seconds");
@@ -244,11 +244,11 @@ You can set your parameters which are used in your modules by adding tables. In 
   balance = 1000
 ```
 
-You can get them by `Config#getUserString(table, name)` and `Config#getUserInteger(table, name)`. If you want to get the default value when the specified table or parameter doesn't exists, you use `Config#getUserString(table, name, defaultValue)` or `Config#getUserInteger(table, name, defaultValue)`.
+You can get them by `Config#getUserString(table, name)` and `Config#getUserLong(table, name)`. If you want to get the default value when the specified table or parameter doesn't exists, you use `Config#getUserString(table, name, defaultValue)` or `Config#getUserLong(table, name, defaultValue)`.
 
 ```java
   String testName = config.getUserString("my_test", "test_name");
-  int numAccounts = config.getUserInteger("initial_values", "accounts");
-  int initalBalance = config.getUserInteger("initial_values", "balance");
-  int amount = config.getUserInteger("initial_values", "amount", 10);
+  long numAccounts = config.getUserLong("initial_values", "accounts");
+  long initalBalance = config.getUserLong("initial_values", "balance");
+  long amount = config.getUserLong("initial_values", "amount", 10);
 ```
