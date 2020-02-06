@@ -56,7 +56,7 @@ public class KelpieExecutor {
   }
 
   private void executeConcurrently() {
-    int concurrency = config.getConcurrency();
+    int concurrency = (int) config.getConcurrency();
     ExecutorService es = Executors.newFixedThreadPool(concurrency + 1);
     List<CompletableFuture> futures = new ArrayList<>();
 
