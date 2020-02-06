@@ -1,30 +1,36 @@
 package com.scalar.kelpie.config;
 
 import com.moandjiezana.toml.Toml;
+import com.scalar.kelpie.exception.IllegalConfigException;
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
 public class Config {
+  private final String DEFAULT_INJECTION_EXECUTOR =
+      "com.scalar.kelpie.executor.RandomInjectionExecutor";
   private final Toml toml;
 
-  private Optional<String> preProcessorName;
-  private Optional<String> processorName;
-  private Optional<String> postProcessorName;
-  private Optional<String> injectorName;
-  private Optional<String> preProcessorPath;
-  private Optional<String> processorPath;
-  private Optional<String> postProcessorPath;
-  private Optional<String> injectorPath;
+  private Optional<String> preProcessorName = Optional.empty();
+  private Optional<String> processorName = Optional.empty();
+  private Optional<String> postProcessorName = Optional.empty();
+  private Optional<String> preProcessorPath = Optional.empty();
+  private Optional<String> processorPath = Optional.empty();
+  private Optional<String> postProcessorPath = Optional.empty();
+  private Optional<String> injectionExecutor = Optional.empty();
+  private final Map<String, String> injectors = new HashMap<String, String>();
   private boolean preProcessorEnabled = false;
   private boolean processorEnabled = false;
   private boolean postProcessorEnabled = false;
   private boolean injectorEnabled = false;
 
-  private Long concurrency = 1L;
-  private Long runForSec = 60L;
-  private Long rampForSec = 0L;
+  private int concurrency = 1;
+  private int runForSec = 60;
+  private int rampForSec = 0;
 
   public Config(String tomlText) {
     this(new Toml().read(tomlText));
@@ -55,10 +61,6 @@ public class Config {
     return postProcessorName;
   }
 
-  public Optional<String> getInjectorName() {
-    return injectorName;
-  }
-
   public Optional<String> getPreProcessorPath() {
     return preProcessorPath;
   }
@@ -71,20 +73,24 @@ public class Config {
     return postProcessorPath;
   }
 
-  public Optional<String> getInjectorPath() {
-    return injectorPath;
+  public Map<String, String> getInjectors() {
+    return injectors;
   }
 
-  public Long getConcurrency() {
+  public int getConcurrency() {
     return concurrency;
   }
 
-  public Long getRunForSec() {
+  public int getRunForSec() {
     return runForSec;
   }
 
-  public Long getRampForSet() {
+  public int getRampForSec() {
     return rampForSec;
+  }
+
+  public Optional<String> getInjectionExecutor() {
+    return injectionExecutor;
   }
 
   public boolean isPreProcessorEnabled() {
@@ -127,24 +133,46 @@ public class Config {
 
   private void loadCommon() {
     Toml modules = toml.getTable("modules");
-    preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
-    processorName = Optional.ofNullable(modules.getString("processor.name"));
-    postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
-    injectorName = Optional.ofNullable(modules.getString("injector.name"));
-    preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
-    processorPath = Optional.ofNullable(modules.getString("processor.path"));
-    postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
-    injectorPath = Optional.ofNullable(modules.getString("injector.path"));
+    if (modules != null) {
+      preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
+      processorName = Optional.ofNullable(modules.getString("processor.name"));
+      postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
+      preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
+      processorPath = Optional.ofNullable(modules.getString("processor.path"));
+      postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
+
+      List<Toml> injectorsTable = modules.getTables("injectors");
+      if (injectorsTable != null) {
+        injectorsTable.forEach(
+            i -> {
+              injectors.put(i.getString("name"), i.getString("path"));
+            });
+      }
+    }
 
     Toml common = toml.getTable("common");
     if (common.getLong("concurrency") != null) {
-      concurrency = common.getLong("concurrency");
+      concurrency = new Integer(common.getLong("concurrency").toString());
+      if (concurrency <= 0) {
+        throw new IllegalConfigException("common.concurrency should be positive");
+      }
     }
     if (common.getLong("run_for_sec") != null) {
-      runForSec = common.getLong("run_for_sec");
+      runForSec = new Integer(common.getLong("run_for_sec").toString());
+      if (runForSec <= 0) {
+        throw new IllegalConfigException("common.run_for_sec should be positive");
+      }
     }
     if (common.getLong("run_for_sec") != null) {
-      rampForSec = common.getLong("ramp_for_sec");
+      rampForSec = new Integer(common.getLong("ramp_for_sec").toString());
+      if (rampForSec <= 0) {
+        throw new IllegalConfigException("common.ramp_for_sec should be positive");
+      }
+    }
+    if (common.getString("injection_executor") != null) {
+      injectionExecutor = Optional.of(common.getString("injection_executor"));
+    } else {
+      injectionExecutor = Optional.of(DEFAULT_INJECTION_EXECUTOR);
     }
   }
 }

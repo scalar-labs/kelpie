@@ -3,6 +3,7 @@ package com.scalar.kelpie;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.executor.KelpieExecutor;
 import java.io.File;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
@@ -39,6 +40,12 @@ public class Kelpie implements Callable {
       description = "Execute only the post-process")
   private boolean onlyPost = false;
 
+  @CommandLine.Option(
+      names = {"--inject"},
+      required = false,
+      description = "Execute the injectors")
+  private boolean injected = false;
+
   public static void main(String[] args) {
     int exitCode = new CommandLine(new Kelpie()).execute(args);
     System.exit(exitCode);
@@ -59,6 +66,10 @@ public class Kelpie implements Callable {
       config.enablePostProcessor();
     } else {
       config.enableAllProcessors();
+    }
+
+    if (injected) {
+      config.enableInjector();
     }
 
     Injector injector = Guice.createInjector(new KelpieModule(config));

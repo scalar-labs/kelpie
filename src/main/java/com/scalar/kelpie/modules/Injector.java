@@ -2,11 +2,10 @@ package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
 
-public abstract class Injector implements Module {
-  protected Config config;
+public abstract class Injector extends Module {
 
-  public void initialize(Config config) {
-    this.config = config;
+  public Injector(Config config) {
+    super(config);
   }
 
   public abstract void inject();

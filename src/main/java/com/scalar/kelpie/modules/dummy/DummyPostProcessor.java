@@ -4,10 +4,9 @@ import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.PostProcessor;
 
 public class DummyPostProcessor extends PostProcessor {
-  protected Config config;
 
-  public void initialize(Config config) {
-    this.config = config;
+  public DummyPostProcessor(Config config) {
+    super(config);
   }
 
   @Override
