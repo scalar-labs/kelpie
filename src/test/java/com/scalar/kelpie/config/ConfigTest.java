@@ -17,16 +17,16 @@ public class ConfigTest {
   static final String ANY_INJECTOR2_NAME = "my.Injector2";
   static final String ANY_INJECTOR2_PATH = "/path/to/Injector2";
   static final String ANY_INECTION_EXECUTOR = "com.scalar.kelpie.executor.Test";
-  static final int ANY_CONCURRENCY = 8;
+  static final long ANY_CONCURRENCY = 8L;
   static final String MY_CONFIG_TABLE = "my_config";
   static final String WRONG_CONFIG_TABLE = "no_config";
-  static final String INT_PARAMETER = "my_int_parameter";
+  static final String LONG_PARAMETER = "my_long_parameter";
   static final String STRING_PARAMETER = "my_str_parameter";
   static final String WRONG_PARAMETER = "no_parameter";
-  static final int ANY_INT = 100;
+  static final long ANY_LONG = 100L;
   static final String ANY_STRING = "test";
 
-  static final int DEFAULT_RUN_FOR_SEC = 60;
+  static final long DEFAULT_RUN_FOR_SEC = 60L;
   static final String WRONG_FILE = "/path/to/config.toml";
 
   static final String tomlText =
@@ -61,9 +61,9 @@ public class ConfigTest {
           + "["
           + MY_CONFIG_TABLE
           + "]\n"
-          + INT_PARAMETER
+          + LONG_PARAMETER
           + " = "
-          + ANY_INT
+          + ANY_LONG
           + "\n"
           + STRING_PARAMETER
           + " = \""
@@ -113,7 +113,7 @@ public class ConfigTest {
     Config config = new Config(tomlText);
 
     // Act
-    int concurrency = config.getConcurrency();
+    long concurrency = config.getConcurrency();
 
     // Assert
     assertThat(concurrency).isEqualTo(ANY_CONCURRENCY);
@@ -135,7 +135,7 @@ public class ConfigTest {
     Config config = new Config(tomlText);
 
     // Act
-    int runForSec = config.getRunForSec();
+    long runForSec = config.getRunForSec();
 
     // Assert
     assertThat(runForSec).isEqualTo(DEFAULT_RUN_FOR_SEC);
@@ -156,7 +156,8 @@ public class ConfigTest {
   @Test
   public void getInjectionExecutor_ShouldGetProperly() {
     // Arrange
-    Config config = new Config("[common]\n" + "injection_executor = \"" + ANY_INECTION_EXECUTOR + "\"");
+    Config config =
+        new Config("[common]\n" + "injection_executor = \"" + ANY_INECTION_EXECUTOR + "\"");
 
     // Act
     String executor = config.getInjectionExecutor().get();
@@ -166,27 +167,27 @@ public class ConfigTest {
   }
 
   @Test
-  public void getUserInteger_ShouldGetProperly() {
+  public void getUserLong_ShouldGetProperly() {
     // Arrange
     Config config = new Config(tomlText);
 
     // Act
-    int parameter = config.getUserInteger(MY_CONFIG_TABLE, INT_PARAMETER);
+    long parameter = config.getUserLong(MY_CONFIG_TABLE, LONG_PARAMETER);
 
     // Assert
-    assertThat(parameter).isEqualTo(ANY_INT);
+    assertThat(parameter).isEqualTo(ANY_LONG);
   }
 
   @Test
-  public void getUserInteger_DefaultValueGiven_ShouldGetProperly() {
+  public void getUserLong_DefaultValueGiven_ShouldGetProperly() {
     // Arrange
     Config config = new Config(tomlText);
 
     // Act
-    int parameter = config.getUserInteger(WRONG_CONFIG_TABLE, INT_PARAMETER, ANY_INT);
+    long parameter = config.getUserLong(WRONG_CONFIG_TABLE, LONG_PARAMETER, ANY_LONG);
 
     // Assert
-    assertThat(parameter).isEqualTo(ANY_INT);
+    assertThat(parameter).isEqualTo(ANY_LONG);
   }
 
   @Test
@@ -214,27 +215,27 @@ public class ConfigTest {
   }
 
   @Test
-  public void getUserInteger_NonExistTableGiven_ShouldThrowIllegalConfigException() {
+  public void getUserLong_NonExistTableGiven_ShouldThrowIllegalConfigException() {
     // Arrange
     Config config = new Config(tomlText);
 
     // Act Assert
     assertThatThrownBy(
             () -> {
-              config.getUserInteger(WRONG_CONFIG_TABLE, INT_PARAMETER);
+              config.getUserLong(WRONG_CONFIG_TABLE, LONG_PARAMETER);
             })
         .isInstanceOf(IllegalConfigException.class);
   }
 
   @Test
-  public void getUserInteger_NonExistParameterGiven_ShouldThrowIllegalConfigException() {
+  public void getUserLong_NonExistParameterGiven_ShouldThrowIllegalConfigException() {
     // Arrange
     Config config = new Config(tomlText);
 
     // Act Assert
     assertThatThrownBy(
             () -> {
-              config.getUserInteger(MY_CONFIG_TABLE, WRONG_PARAMETER);
+              config.getUserLong(MY_CONFIG_TABLE, WRONG_PARAMETER);
             })
         .isInstanceOf(IllegalConfigException.class);
   }
@@ -250,7 +251,7 @@ public class ConfigTest {
               config.getUserString(MY_CONFIG_TABLE, WRONG_PARAMETER);
             })
         .isInstanceOf(IllegalConfigException.class);
-   }
+  }
 
   @Test
   public void constructor_ShouldThrowRuntimeException() {

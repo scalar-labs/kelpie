@@ -12,7 +12,7 @@ public class PrintPost extends PostProcessor {
   @Override
   public void execute() {
     String title = config.getUserString("print_test", "title");
-    int num = config.getUserInteger("print_test", "num");
+    long num = config.getUserLong("print_test", "num");
 
     System.out.println("Checking for " + title);
     System.out.println("Run for " + num + " seconds");

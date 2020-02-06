@@ -28,9 +28,9 @@ public class Config {
   private boolean postProcessorEnabled = false;
   private boolean injectorEnabled = false;
 
-  private int concurrency = 1;
-  private int runForSec = 60;
-  private int rampForSec = 0;
+  private long concurrency = 1L;
+  private long runForSec = 60L;
+  private long rampForSec = 0L;
 
   public Config(String tomlText) {
     this(new Toml().read(tomlText));
@@ -77,15 +77,15 @@ public class Config {
     return injectors;
   }
 
-  public int getConcurrency() {
+  public long getConcurrency() {
     return concurrency;
   }
 
-  public int getRunForSec() {
+  public long getRunForSec() {
     return runForSec;
   }
 
-  public int getRampForSec() {
+  public long getRampForSec() {
     return rampForSec;
   }
 
@@ -131,11 +131,11 @@ public class Config {
     enablePostProcessor();
   }
 
-  public int getUserInteger(String table, String name) {
-    return getUserInteger(table, name, null);
+  public long getUserLong(String table, String name) {
+    return getUserLong(table, name, null);
   }
 
-  public int getUserInteger(String table, String name, Integer defaultValue) {
+  public long getUserLong(String table, String name, Long defaultValue) {
     final Toml t;
     try {
       t = getTable(table);
@@ -149,7 +149,7 @@ public class Config {
 
     Long v = t.getLong(name);
     if (v != null) {
-      return new Integer(v.toString());
+      return v;
     } else if (defaultValue != null) {
       return defaultValue;
     } else {
@@ -213,19 +213,19 @@ public class Config {
 
     Toml common = toml.getTable("common");
     if (common.getLong("concurrency") != null) {
-      concurrency = new Integer(common.getLong("concurrency").toString());
+      concurrency = common.getLong("concurrency");
       if (concurrency <= 0) {
         throw new IllegalConfigException("common.concurrency should be positive");
       }
     }
     if (common.getLong("run_for_sec") != null) {
-      runForSec = new Integer(common.getLong("run_for_sec").toString());
+      runForSec = common.getLong("run_for_sec");
       if (runForSec <= 0) {
         throw new IllegalConfigException("common.run_for_sec should be positive");
       }
     }
     if (common.getLong("run_for_sec") != null) {
-      rampForSec = new Integer(common.getLong("ramp_for_sec").toString());
+      rampForSec = common.getLong("ramp_for_sec");
       if (rampForSec <= 0) {
         throw new IllegalConfigException("common.ramp_for_sec should be positive");
       }

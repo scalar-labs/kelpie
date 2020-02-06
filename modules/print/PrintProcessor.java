@@ -11,9 +11,9 @@ public class PrintProcessor extends Processor {
 
   @Override
   public void execute() {
-    int num = config.getUserInteger("print_test", "num");
+    long num = config.getUserLong("print_test", "num");
 
-    for (int i = 0; i < num; i++) {
+    for (long i = 0; i < num; i++) {
       try {
         long id = Thread.currentThread().getId();
         System.out.println("[thread " + id + "] Runnning... " + i);
