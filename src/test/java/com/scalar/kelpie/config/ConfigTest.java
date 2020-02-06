@@ -178,12 +178,36 @@ public class ConfigTest {
   }
 
   @Test
+  public void getUserInteger_DefaultValueGiven_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    int parameter = config.getUserInteger(WRONG_CONFIG_TABLE, INT_PARAMETER, ANY_INT);
+
+    // Assert
+    assertThat(parameter).isEqualTo(ANY_INT);
+  }
+
+  @Test
   public void getUserString_ShouldGetProperly() {
     // Arrange
     Config config = new Config(tomlText);
 
     // Act
     String parameter = config.getUserString(MY_CONFIG_TABLE, STRING_PARAMETER);
+
+    // Assert
+    assertThat(parameter).isEqualTo(ANY_STRING);
+  }
+
+  @Test
+  public void getUserString_DefaultValueGiven_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    String parameter = config.getUserString(MY_CONFIG_TABLE, WRONG_PARAMETER, ANY_STRING);
 
     // Assert
     assertThat(parameter).isEqualTo(ANY_STRING);

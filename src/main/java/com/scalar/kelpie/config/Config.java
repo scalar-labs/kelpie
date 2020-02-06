@@ -132,18 +132,52 @@ public class Config {
   }
 
   public int getUserInteger(String table, String name) {
-    Long v = getTable(table).getLong(name);
+    return getUserInteger(table, name, null);
+  }
+
+  public int getUserInteger(String table, String name, Integer defaultValue) {
+    final Toml t;
+    try {
+      t = getTable(table);
+    } catch (IllegalConfigException e) {
+      if (defaultValue != null) {
+        return defaultValue;
+      } else {
+        throw e;
+      }
+    }
+
+    Long v = t.getLong(name);
     if (v != null) {
       return new Integer(v.toString());
+    } else if (defaultValue != null) {
+      return defaultValue;
     } else {
       throw new IllegalConfigException(table + "." + name + " doesn't exist");
     }
   }
 
   public String getUserString(String table, String name) {
-    String str = getTable(table).getString(name);
+    return getUserString(table, name, null);
+  }
+
+  public String getUserString(String table, String name, String defaultValue) {
+    final Toml t;
+    try {
+      t = getTable(table);
+    } catch (IllegalConfigException e) {
+      if (defaultValue != null) {
+        return defaultValue;
+      } else {
+        throw e;
+      }
+    }
+
+    String str = t.getString(name);
     if (str != null) {
       return str;
+    } else if (defaultValue != null) {
+      return defaultValue;
     } else {
       throw new IllegalConfigException(table + "." + name + " doesn't exist");
     }
