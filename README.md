@@ -244,10 +244,11 @@ You can set your parameters which are used in your modules by adding tables. In 
   balance = 1000
 ```
 
-You can get them by `Config#getUserString()` and `Config#getUserInteger()`.
+You can get them by `Config#getUserString(table, name)` and `Config#getUserInteger(table, name)`. If you want to get the default value when the specified table or parameter doesn't exists, you use `Config#getUserString(table, name, defaultValue)` or `Config#getUserInteger(table, name, defaultValue)`.
 
 ```java
   String testName = config.getUserString("my_test", "test_name");
   int numAccounts = config.getUserInteger("initial_values", "accounts");
   int initalBalance = config.getUserInteger("initial_values", "balance");
+  int amount = config.getUserInteger("initial_values", "amount", 10);
 ```
