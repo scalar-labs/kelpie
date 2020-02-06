@@ -18,9 +18,14 @@ public class ConfigTest {
   static final String ANY_INJECTOR2_PATH = "/path/to/Injector2";
   static final String ANY_INECTION_EXECUTOR = "com.scalar.kelpie.executor.Test";
   static final int ANY_CONCURRENCY = 8;
-  static final String ANY_ADDITIONAL_CONFIG = "my_config";
-  static final String ANY_PARAMETER = "my_parameter";
-  static final Long ANY_VALUE = 100L;
+  static final String MY_CONFIG_TABLE = "my_config";
+  static final String WRONG_CONFIG_TABLE = "no_config";
+  static final String INT_PARAMETER = "my_int_parameter";
+  static final String STRING_PARAMETER = "my_str_parameter";
+  static final String WRONG_PARAMETER = "no_parameter";
+  static final int ANY_INT = 100;
+  static final String ANY_STRING = "test";
+
   static final int DEFAULT_RUN_FOR_SEC = 60;
   static final String WRONG_FILE = "/path/to/config.toml";
 
@@ -54,12 +59,16 @@ public class ConfigTest {
           + ANY_CONCURRENCY
           + "\n"
           + "["
-          + ANY_ADDITIONAL_CONFIG
+          + MY_CONFIG_TABLE
           + "]\n"
-          + ANY_PARAMETER
+          + INT_PARAMETER
           + " = "
-          + ANY_VALUE
-          + "\n";
+          + ANY_INT
+          + "\n"
+          + STRING_PARAMETER
+          + " = \""
+          + ANY_STRING
+          + "\"\n";
 
   @Test
   public void getPreProcessorName_ShouldGetProperly() {
@@ -133,18 +142,6 @@ public class ConfigTest {
   }
 
   @Test
-  public void getMyConfigValue_ShouldGetProperly() {
-    // Arrange
-    Config config = new Config(tomlText);
-
-    // Act
-    Long parameter = config.getToml().getTable(ANY_ADDITIONAL_CONFIG).getLong(ANY_PARAMETER);
-
-    // Assert
-    assertThat(parameter).isEqualTo(ANY_VALUE);
-  }
-
-  @Test
   public void getInjectionExecutor_ShouldGetDefaultExecutor() {
     // Arrange
     Config config = new Config(tomlText);
@@ -167,6 +164,69 @@ public class ConfigTest {
     // Assert
     assertThat(executor).isEqualTo(ANY_INECTION_EXECUTOR);
   }
+
+  @Test
+  public void getUserInteger_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    int parameter = config.getUserInteger(MY_CONFIG_TABLE, INT_PARAMETER);
+
+    // Assert
+    assertThat(parameter).isEqualTo(ANY_INT);
+  }
+
+  @Test
+  public void getUserString_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    String parameter = config.getUserString(MY_CONFIG_TABLE, STRING_PARAMETER);
+
+    // Assert
+    assertThat(parameter).isEqualTo(ANY_STRING);
+  }
+
+  @Test
+  public void getUserInteger_NonExistTableGiven_ShouldThrowIllegalConfigException() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act Assert
+    assertThatThrownBy(
+            () -> {
+              config.getUserInteger(WRONG_CONFIG_TABLE, INT_PARAMETER);
+            })
+        .isInstanceOf(IllegalConfigException.class);
+  }
+
+  @Test
+  public void getUserInteger_NonExistParameterGiven_ShouldThrowIllegalConfigException() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act Assert
+    assertThatThrownBy(
+            () -> {
+              config.getUserInteger(MY_CONFIG_TABLE, WRONG_PARAMETER);
+            })
+        .isInstanceOf(IllegalConfigException.class);
+  }
+
+  @Test
+  public void getUserString_NonExistParameterGiven_ShouldThrowIllegalConfigException() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act Assert
+    assertThatThrownBy(
+            () -> {
+              config.getUserString(MY_CONFIG_TABLE, WRONG_PARAMETER);
+            })
+        .isInstanceOf(IllegalConfigException.class);
+   }
 
   @Test
   public void constructor_ShouldThrowRuntimeException() {

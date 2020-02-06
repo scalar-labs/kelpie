@@ -131,6 +131,33 @@ public class Config {
     enablePostProcessor();
   }
 
+  public int getUserInteger(String table, String name) {
+    Long v = getTable(table).getLong(name);
+    if (v != null) {
+      return new Integer(v.toString());
+    } else {
+      throw new IllegalConfigException(table + "." + name + " doesn't exist");
+    }
+  }
+
+  public String getUserString(String table, String name) {
+    String str = getTable(table).getString(name);
+    if (str != null) {
+      return str;
+    } else {
+      throw new IllegalConfigException(table + "." + name + " doesn't exist");
+    }
+  }
+
+  private Toml getTable(String table) {
+    Toml t = toml.getTable(table);
+    if (t == null) {
+      throw new IllegalConfigException(table + " doesn't exist");
+    }
+
+    return t;
+  }
+
   private void loadCommon() {
     Toml modules = toml.getTable("modules");
     if (modules != null) {

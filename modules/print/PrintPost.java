@@ -1,6 +1,5 @@
 package print;
 
-import com.moandjiezana.toml.Toml;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.PostProcessor;
 
@@ -12,12 +11,8 @@ public class PrintPost extends PostProcessor {
 
   @Override
   public void execute() {
-    Toml toml = config.getToml().getTable("print_test");
-    String title = toml.getString("title");
-    Long num = 1L;
-    if (toml.getLong("num") != null) {
-      num = toml.getLong("num");
-    }
+    String title = config.getUserString("print_test", "title");
+    int num = config.getUserInteger("print_test", "num");
 
     System.out.println("Checking for " + title);
     System.out.println("Run for " + num + " seconds");
