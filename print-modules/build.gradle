@@ -1,5 +1,5 @@
 apply plugin: 'java-library-distribution'
 
 dependencies {
-  compileOnly project(':kelpie')
+    compileOnly project(':kelpie')
 }

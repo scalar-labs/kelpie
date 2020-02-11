@@ -11,4 +11,3 @@ rootProject.name = 'kelpie'
 
 include 'kelpie'
 include 'print-modules'
-include 'verification-db'
