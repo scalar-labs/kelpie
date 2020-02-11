@@ -3,6 +3,7 @@ package com.scalar.kelpie.config;
 import com.moandjiezana.toml.Toml;
 import com.scalar.kelpie.exception.IllegalConfigException;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,11 @@ public class Config {
   private Optional<String> processorPath = Optional.empty();
   private Optional<String> postProcessorPath = Optional.empty();
   private Optional<String> injectionExecutor = Optional.empty();
-  private final Map<String, String> injectors = new HashMap<String, String>();
+  private Optional<String> preProcessorClassPath = Optional.empty();
+  private Optional<String> processorClassPath = Optional.empty();
+  private Optional<String> postProcessorClassPath = Optional.empty();
+  private final Map<String, String> injectors = new HashMap<>();
+  private final List<String> injectorClassPaths = new ArrayList<>();
   private boolean preProcessorEnabled = false;
   private boolean processorEnabled = false;
   private boolean postProcessorEnabled = false;
@@ -75,6 +80,22 @@ public class Config {
 
   public Map<String, String> getInjectors() {
     return injectors;
+  }
+
+  public Optional<String> getPreProcessorClassPath() {
+    return preProcessorClassPath;
+  }
+
+  public Optional<String> getProcessorClassPath() {
+    return processorClassPath;
+  }
+
+  public Optional<String> getPostProcessorClassPath() {
+    return postProcessorClassPath;
+  }
+
+  public List<String> getInjectorClassPaths() {
+    return injectorClassPaths;
   }
 
   public long getConcurrency() {
@@ -201,12 +222,18 @@ public class Config {
       preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
       processorPath = Optional.ofNullable(modules.getString("processor.path"));
       postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
+      preProcessorClassPath = Optional.ofNullable(modules.getString("preprocessor.classpath"));
+      processorClassPath = Optional.ofNullable(modules.getString("processor.classpath"));
+      postProcessorClassPath = Optional.ofNullable(modules.getString("postprocessor.classpath"));
 
       List<Toml> injectorsTable = modules.getTables("injectors");
       if (injectorsTable != null) {
         injectorsTable.forEach(
             i -> {
               injectors.put(i.getString("name"), i.getString("path"));
+              if (i.getString("classpath") != null) {
+                injectorClassPaths.add(i.getString("classpath"));
+              }
             });
       }
     }

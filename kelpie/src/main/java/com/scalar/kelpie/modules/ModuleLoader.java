@@ -1,15 +1,14 @@
 package com.scalar.kelpie.modules;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.exception.ModuleLoadException;
 import com.scalar.kelpie.modules.dummy.DummyPostProcessor;
 import com.scalar.kelpie.modules.dummy.DummyPreProcessor;
 import com.scalar.kelpie.modules.dummy.DummyProcessor;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,9 @@ public class ModuleLoader extends ClassLoader {
 
   public PreProcessor loadPreProcessor() throws ModuleLoadException {
     if (config.isPreProcessorEnabled()) {
+      if (config.getPreProcessorClassPath().isPresent()) {
+        addClassPath(config.getPreProcessorClassPath().get());
+      }
       return (PreProcessor)
           loadModule(config.getPreProcessorName().get(), config.getPreProcessorPath().get());
     } else {
@@ -31,6 +33,9 @@ public class ModuleLoader extends ClassLoader {
 
   public Processor loadProcessor() throws ModuleLoadException {
     if (config.isProcessorEnabled()) {
+      if (config.getProcessorClassPath().isPresent()) {
+        addClassPath(config.getProcessorClassPath().get());
+      }
       return (Processor)
           loadModule(config.getProcessorName().get(), config.getProcessorPath().get());
     } else {
@@ -40,6 +45,9 @@ public class ModuleLoader extends ClassLoader {
 
   public PostProcessor loadPostProcessor() throws ModuleLoadException {
     if (config.isPostProcessorEnabled()) {
+      if (config.getPostProcessorClassPath().isPresent()) {
+        addClassPath(config.getPostProcessorClassPath().get());
+      }
       return (PostProcessor)
           loadModule(config.getPostProcessorName().get(), config.getPostProcessorPath().get());
     } else {
@@ -52,6 +60,12 @@ public class ModuleLoader extends ClassLoader {
 
     if (config.isInjectorEnabled()) {
       config
+          .getInjectorClassPaths()
+          .forEach(
+              cp -> {
+                addClassPath(cp);
+              });
+      config
           .getInjectors()
           .forEach(
               (name, path) -> {
@@ -62,30 +76,40 @@ public class ModuleLoader extends ClassLoader {
     return injectors;
   }
 
-  private Module loadModule(String className, String classPath) throws ModuleLoadException {
-    checkNotNull(className);
-    checkNotNull(classPath);
-
+  private Module loadModule(String className, String jarPath) throws ModuleLoadException {
     try {
-      byte[] byteCode = load(classPath);
-
-      Class<Module> clazz = (Class<Module>) defineClass(className, byteCode, 0, byteCode.length);
+      URL[] urls = new URL[] {new File(jarPath).toURL()};
+      ClassLoader loader = URLClassLoader.newInstance(urls, getClass().getClassLoader());
+      Class<Module> clazz = (Class<Module>) Class.forName(className, true, loader);
       Class[] types = {Config.class};
       Object[] args = {config};
 
       return clazz.getConstructor(types).newInstance(args);
     } catch (Exception e) {
-      throw new ModuleLoadException(
-          "Failed to load a module " + className + " from " + classPath, e);
+      throw new ModuleLoadException("Failed to load a module " + className + " from " + jarPath, e);
     }
   }
 
-  private byte[] load(String path) throws IOException {
-    File file = new File(path);
-    byte[] bytes = new byte[(int) file.length()];
-    try (FileInputStream stream = new FileInputStream(file)) {
-      stream.read(bytes, 0, bytes.length);
+  private void addClassPath(String classPath) {
+    File cp = new File(classPath);
+    if (!cp.isDirectory()) {
+      addPath(cp);
+    } else {
+      for (File f : cp.listFiles()) {
+        addPath(f);
+      }
     }
-    return bytes;
+  }
+
+  private void addPath(File f) {
+    try {
+      URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+      Class<URLClassLoader> urlClass = URLClassLoader.class;
+      Method method = urlClass.getDeclaredMethod("addURL", new Class[] {URL.class});
+      method.setAccessible(true);
+      method.invoke(urlClassLoader, new Object[] {f.toURL()});
+    } catch (Exception e) {
+      throw new ModuleLoadException("Failed to add the classpath " + f, e);
+    }
   }
 }

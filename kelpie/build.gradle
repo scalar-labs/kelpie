@@ -1,0 +1,13 @@
+apply plugin: 'application'
+
+mainClassName = 'com.scalar.kelpie.Kelpie'
+
+dependencies {
+    implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    implementation group: 'com.google.guava', name: 'guava', version: '24.1-jre'
+    implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
+    implementation group: 'info.picocli', name: 'picocli', version: '4.1.4'
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.14.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
+}
