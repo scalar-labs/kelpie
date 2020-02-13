@@ -3,7 +3,6 @@ package com.scalar.kelpie.config;
 import com.moandjiezana.toml.Toml;
 import com.scalar.kelpie.exception.IllegalConfigException;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

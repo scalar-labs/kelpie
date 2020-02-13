@@ -6,7 +6,6 @@ import com.scalar.kelpie.modules.dummy.DummyPostProcessor;
 import com.scalar.kelpie.modules.dummy.DummyPreProcessor;
 import com.scalar.kelpie.modules.dummy.DummyProcessor;
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
