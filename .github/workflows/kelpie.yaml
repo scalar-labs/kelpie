@@ -22,10 +22,11 @@ jobs:
       with:
         java-version: 1.8
 
-    - name: Build Kelpie and modules
+    - name: Build Kelpie
       run: ./gradlew build
 
     - name: Test a sample
       run: |
+        ./gradlew shadowJar
         ./gradlew installDist
-        ./kelpie/build/install/kelpie/bin/kelpie --config print-modules/print.toml --inject
+        ./kelpie/build/install/kelpie/bin/kelpie --config print-modules/config.toml --inject

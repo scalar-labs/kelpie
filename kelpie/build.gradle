@@ -1,6 +1,14 @@
-apply plugin: 'application'
+plugins {
+    id 'java'
+    id 'application'
+}
 
 mainClassName = 'com.scalar.kelpie.Kelpie'
+
+repositories {
+    mavenCentral()
+}
+
 
 dependencies {
     implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'

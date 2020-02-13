@@ -1,16 +1,16 @@
 [modules]
   [modules.preprocessor]
     name = "print.PrintPre"
-    path = "print-modules/build/libs/print-modules.jar"
+    path = "print-modules/build/libs/print-modules-all.jar"
   [modules.processor]
     name = "print.PrintProcessor"
-    path = "print-modules/build/libs/print-modules.jar"
+    path = "print-modules/build/libs/print-modules-all.jar"
   [modules.postprocessor]
     name = "print.PrintPost"
-    path = "print-modules/build/libs/print-modules.jar"
+    path = "print-modules/build/libs/print-modules-all.jar"
   [[modules.injectors]]
     name = "print.PrintInjector"
-    path = "print-modules/build/libs/print-modules.jar"
+    path = "print-modules/build/libs/print-modules-all.jar"
 
 [common]
   concurrency = 4
