@@ -18,16 +18,17 @@ First, Kelpie executes `PreProcessor#preProcess()` like record population. Next,
   - Of course, you can archive Kelpie jar and libraries by `distZip` and so on.
 
 ## Build your modules
-1. Make your modules: `PreProcessor`, `Processor`, `PostProcessor`, `Injector` in `kelpie/modules`.
-    - Refer to sample modules in `kelpie/modules/print`
+1. Make your modules: `PreProcessor`, `Processor`, `PostProcessor`, `Injector`.
+    - Refer to sample modules in `print-modules/`
 2. Build them
     ```
-    ./gradlew modules
+    ./gradlew shadowJar
     ```
+    - Each module should be built to a fat JAR file including libraries that the module depends on.
 
 ## Run your test
 1. Make a config file
-    - Refer to a sample config in `kelpie/modules/print.toml`
+    - Refer to a sample config in `print-modules/config.toml`
     - Specify the path of class files of your modules
     - You can give parameters to your modules by adding your parameters to the config
 2. Run a test
@@ -42,7 +43,7 @@ Kelpie supports your own test with your modules. To use your own modules, you ne
 ## PreProcessor
 `PreProcessor` executes something before `Processor`. For example, in a performance benchmark for a database, `PreProcessor` populates the initial records. `PreProcessor#execute()` is always executed on a single thread.
 
-The following class is a sample of `PreProcessor` to just print the title. You have to implement only the constructor and `execute()` method. Parameters of the config file can be acquired from `config` which has been set by the constructor when the class is loaded. Your parameters can be set in the config file like `conf/print.toml`.
+The following class is a sample of `PreProcessor` to just print the title. You have to implement only the constructor and `execute()` method. Parameters of the config file can be acquired from `config` which has been set by the constructor when the class is loaded. Your parameters can be set in the config file like `print-modules/config.toml`.
 
 ```java
 package print;
