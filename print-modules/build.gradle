@@ -1,0 +1,8 @@
+plugins {
+    id 'java-library-distribution'
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+dependencies {
+    compileOnly project(':kelpie')
+}

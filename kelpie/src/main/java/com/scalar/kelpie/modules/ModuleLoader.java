@@ -1,19 +1,17 @@
 package com.scalar.kelpie.modules;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.exception.ModuleLoadException;
 import com.scalar.kelpie.modules.dummy.DummyPostProcessor;
 import com.scalar.kelpie.modules.dummy.DummyPreProcessor;
 import com.scalar.kelpie.modules.dummy.DummyProcessor;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModuleLoader extends ClassLoader {
+public class ModuleLoader {
   private Config config;
 
   public ModuleLoader(Config config) {
@@ -62,30 +60,17 @@ public class ModuleLoader extends ClassLoader {
     return injectors;
   }
 
-  private Module loadModule(String className, String classPath) throws ModuleLoadException {
-    checkNotNull(className);
-    checkNotNull(classPath);
-
+  private Module loadModule(String className, String jarPath) throws ModuleLoadException {
     try {
-      byte[] byteCode = load(classPath);
-
-      Class<Module> clazz = (Class<Module>) defineClass(className, byteCode, 0, byteCode.length);
+      URL[] urls = new URL[] {new File(jarPath).toURI().toURL()};
+      ClassLoader loader = URLClassLoader.newInstance(urls, getClass().getClassLoader());
+      Class<Module> clazz = (Class<Module>) Class.forName(className, true, loader);
       Class[] types = {Config.class};
       Object[] args = {config};
 
       return clazz.getConstructor(types).newInstance(args);
     } catch (Exception e) {
-      throw new ModuleLoadException(
-          "Failed to load a module " + className + " from " + classPath, e);
+      throw new ModuleLoadException("Failed to load a module " + className + " from " + jarPath, e);
     }
-  }
-
-  private byte[] load(String path) throws IOException {
-    File file = new File(path);
-    byte[] bytes = new byte[(int) file.length()];
-    try (FileInputStream stream = new FileInputStream(file)) {
-      stream.read(bytes, 0, bytes.length);
-    }
-    return bytes;
   }
 }

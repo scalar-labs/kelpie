@@ -8,3 +8,6 @@
  */
 
 rootProject.name = 'kelpie'
+
+include 'kelpie'
+include 'print-modules'

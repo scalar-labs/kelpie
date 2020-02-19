@@ -22,7 +22,7 @@ public class Config {
   private Optional<String> processorPath = Optional.empty();
   private Optional<String> postProcessorPath = Optional.empty();
   private Optional<String> injectionExecutor = Optional.empty();
-  private final Map<String, String> injectors = new HashMap<String, String>();
+  private final Map<String, String> injectors = new HashMap<>();
   private boolean preProcessorEnabled = false;
   private boolean processorEnabled = false;
   private boolean postProcessorEnabled = false;
