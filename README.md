@@ -4,11 +4,15 @@
 
 Kelpie is a simple yet general framework for running end-to-end testing such as system verification and benchmarking.
 
-A test consists of 4 modules: `PreProcessor`, `Processor`, `PostProcessor` and `Injector`. You can make your own modules.
+## How Kelpie works
+Kelpie is composed of a framework that orchestrates a test and takes care of task management such as concurrent execution, and a test that is run by the framework.
+As the following diagram, a test in Kelpie has 3 steps; pre-processing, processing and post-processing, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
 
-Before testing, you need to set up your environment.
-
-First, Kelpie executes `PreProcessor#preProcess()` like record population. Next, it executes `Processor#process()`. `Injector#inject()` tries to inject failure or other operations while the `Processor#process()` performs. After `Processor#process()` is completed, Kelpie executes `PostProcessor#postProcess()`.
+<p align="center">
+  <img src="doc/kelpie.png" width=450px>
+  <br>
+  Kelpie overview
+</p>
 
 # Usage
 ## Build Kelpie
@@ -18,8 +22,8 @@ First, Kelpie executes `PreProcessor#preProcess()` like record population. Next,
   - Of course, you can archive Kelpie jar and libraries by `distZip` and so on.
 
 ## Build your modules
-1. Make your modules: `PreProcessor`, `Processor`, `PostProcessor`, `Injector`.
-    - Refer to sample modules in `print-modules/`
+1. The first thing to do to run your test with Kelpie, you need to create your own modules
+    - Note that you don't need to create all 4 modules but you need at least one module. Please refer to [example modules](print-modules/), which do trivial printing work.
 2. Build them
     ```
     ./gradlew shadowJar
@@ -27,23 +31,22 @@ First, Kelpie executes `PreProcessor#preProcess()` like record population. Next,
     - Each module should be built to a fat JAR file including libraries that the module depends on.
 
 ## Run your test
-1. Make a config file
-    - Refer to a sample config in `print-modules/config.toml`
-    - Specify the path of class files of your modules
-    - You can give parameters to your modules by adding your parameters to the config
+1. Prepare a configuration file
+    - A configuration file for Kelpie requires at least the locations of modules to run. Additionally, you can define static variables to pass to modules in the file. Please refer to an example configuration file in `print-modules/config.toml` for more detail.
 2. Run a test
     ```
     kelpie/build/install/kelpie/bin/kelpie --config your_config.toml
     ```
-    - If `--only-pre` is added, Kelpie will execute only the pre phase. There are other options `--only-process`, `--only-post`.
+    - There are other options such as `--only-pre`, `--only-process` and `--only-post`, which run only the specified step.
 
-# Your modules
-Kelpie supports your own test with your modules. To use your own modules, you need to implement `PreProcessor`, `Processor` and `PostProcessor`. If needed, `Injector` can be implemented for injection to your test.
+# How to create your own modules
+Let's take a closer look at each module to properly write your own modules.
 
 ## PreProcessor
-`PreProcessor` executes something before `Processor`. For example, in a performance benchmark for a database, `PreProcessor` populates the initial records. `PreProcessor#execute()` is always executed on a single thread.
+`PreProcessor` runs some tasks before `Processor`. It is usually used for some preparation of the subsequent processing. For example, it can populate initial records for a database performance benchmarking.
+`PreProcessor` has one method called `execute` where you can define its behavior. `execute` can be non-thread-safe since it is executed by a single thread.
 
-The following class is a sample of `PreProcessor` to just print the title. You have to implement only the constructor and `execute()` method. Parameters of the config file can be acquired from `config` which has been set by the constructor when the class is loaded. Your parameters can be set in the config file like `print-modules/config.toml`.
+The following is `PrintPre` class from the example print modules, which does nothing except for printing some texts to stdout. As you can see, you can write arbitrary code in the `execute` method. Also, you can pass some static variables to the method through `Config` that is instantiated based on a configuration file (`print-modules/config.toml` for the print-modules case).
 
 ```java
 package print;
