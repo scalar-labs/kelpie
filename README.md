@@ -6,7 +6,7 @@ Kelpie is a simple yet general framework for running end-to-end testing such as 
 
 ## How Kelpie works
 Kelpie is composed of a framework that orchestrates a test and takes care of task management such as concurrent execution, and a test that is run by the framework.
-As the following diagram shows, a test in Kelpie has 3 steps; pre-processing, processing and post-processing, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
+As the following diagram shows, a test in Kelpie has 3 steps; pre-process, process and post-process, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
 
 <p align="center">
   <img src="doc/kelpie.png" width=450px>
