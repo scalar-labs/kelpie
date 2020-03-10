@@ -6,7 +6,7 @@ Kelpie is a simple yet general framework for running end-to-end testing such as 
 
 ## How Kelpie works
 Kelpie is composed of a framework that orchestrates a test and takes care of task management such as concurrent execution, and a test that is run by the framework.
-As the following diagram, a test in Kelpie has 3 steps; pre-processing, processing and post-processing, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
+As the following diagram shows, a test in Kelpie has 3 steps; pre-processing, processing and post-processing, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
 
 <p align="center">
   <img src="doc/kelpie.png" width=450px>
@@ -69,11 +69,11 @@ public class PrintPre extends PreProcessor {
 ```
 
 ## Processor
-`Processor` executes the main process. For example, `Processor` makes and sends requests to the server.
+`Processor` executes actual tests. For example, if it is benchmarking a database server, `Processor` makes a query, send it to the server, get the response back from the server, and continue them until it finishes.
 
-Like `Preprocessor`, you have to implement the constructor and `execute()`. `execute()` might be executed concurrently on multiple threads. That's why you need to make `execute()` thread-safe. If you don't want to do `execute()` concurrently, you have to set `concurrency = 1` in the config file.
+Like `Preprocessor`, you need to implement the constructor and `execute()`. `execute()` can be executed concurrently with multiple threads if `concurrency` is set to more than 1 in the configuration file. Note that you need to make `execute()` thread-safe in that case.
 
-The following class is a sample of `Processor`. It gets a number of `num` from `config`, counts the number and waits for a second. If you set `concurrency` more than 1, these counting messages are output by each thread.
+The following class is an example of `Processor`, which prints out a message for the specified number of times by `num`. 
 
 ```java
 package print;
@@ -104,9 +104,9 @@ public class PrintProcessor extends Processor {
 ```
 
 ## PostProcessor
-`PostProcessor` executes something after all `Processor#execute()` finish. For example, `PostProcessor` reads all records of the database and checks if their values are as expected. `PostProcessor#execute()` is always executed on a single thread.
+`PostProcessor` executes some tasks after all `Processor#execute()` finish. For example, if it is verifying database consistency, `PostProcessor` reads all the records of the database and checks if their values are as expected. `PostProcessor#execute()` is always executed with a single thread.
 
-Like `PreProcessor` and `Processor`, you have to implement the constructor and `execute()`. The following class is a sample of `PostProcessor` to just print the summary. It gets the parameters `title` and `num` from `config` and prints the summary.
+Like `PreProcessor` and `Processor`, you need to implement the constructor and `execute()`. The following class is an example of `PostProcessor`, which prints out the specified configurations.
 
 ```java
 package print;
@@ -127,23 +127,26 @@ public class PrintPost extends PostProcessor {
     System.out.println("Checking for " + title);
     System.out.println("Run for " + num + " seconds");
 
-    // always succeed
+    // always succeed in this case
+
+    // if unexpected result happens,
+    // throw new PostProcessException("unexpected result happens");
   }
 }
 ```
 
-If you want `PostProcessor` to check the result of `Processor` execution, `PostProcessor#execute()` might need to throw an exception for the unexpected result. A test will fail when an exception is thrown from each module.
+When `PostProcessor` check the result of `Processor` execution and the result isn't expected, `PostProcessor#execute()` should throw an exception `PostProcessException`. A test will fail when the exception is thrown.
 
 ## Injector
-`Injector` is different from other modules. It is executed while `Processor#execute()` is running. For example, `Injector` kills and restarts a database process for distructive testing.
+`Injector` executes some arbitrary tasks that you want to execute while `Processor#execute()` is running. For example, if it is verifying database consistency in a catastrophic environment, `Injector` kills and restarts a database process randomly and frequently.
 
-You execute `Injector` by `--inject` option when you start a test with Kelpie.
+You can enable `Injector` by adding `--inject` option to the `kelpie` command.
 
-```bash
+```console
 $ ./kelpie --config my_config.toml --inject
 ```
 
-The following class is a sample of `Injector`. You have to implement `inject()` and `eject()`. Kelpie always executes `eject()` after `inject()` when an `Injector` is invoked. `inject()` and `eject()` of the sample `Injector` waits a few seconds and prints a message.
+The following class is an example of `Injector` that only prints out some text after some random sleep. `Injector` has two methods to implement; `inject()` and `eject()`. Note that `inject` is always executed before `eject()`.
 
 ```java
 package print;
@@ -186,19 +189,17 @@ public class PrintInjector extends Injector {
 }
 ```
 
-You can add multiple `Injector`s. They are invoked by `InjectionExecutor`.
+When multiple `Injector`s are specified, the way they run concurrently is controlled by `InjectionExecutor`. The currently default `InjectionExecutor` is called `RandomInjectionExecutor`. `RandomInjectionExecutor` randomly selects and invokes one `injector` from the multiple `injector`s at a time.
 
-The default executor is `com.scalar.kelpie.executor.RandomInjectionExecutor`. It invokes them one by one. When an `Injector A` starts its `inject()`, any other `Injector` isn't invoked until `Injector A` finishes its `eject()`. And, invoked `Injector` is chosen randomly from all `Injector`s.
-
-In the future, you can choose `InjectionExecutor` by adding `injection_executor` parameter on `[common]` table in the config file.
+In the future, you may be able to specify `InjectionExecutor` in the configuration.
 
 # Config
-You can modify the behavior of your test by the config file. The format of a config file is TOML.
-
-A config consists of at least two tables; `[modules]` and `[common]`. They are used for the execution behavior of Kelpie. And, you can add your own parameters.
+A config is a TOML-formatted file where you can define what modules and static variables to use in your test.
+A config file consists of at least a table `[modules]`. `[commmon]` is optional, but it is useful for your test.
 
 ## [modules]
-Each module is specified with the name and the path of the class file on `[modules]`. For `PreProcessor`, `Processor` and `PostProcessor`, each module is specified with `name` and `path` on each table like `[modules.preprocessor]`. You can specify multiple `Injector`s. `Injector` is specified with the name and the path of the class file like other modules. You have to use an array of the tables `[[modules.injectors]]` to specify `Injector`s.
+`[modules]` is where you specify what modules to run.
+As the following example shows, each module needs to be specified with the binary name and the path of a class file in a respective table such as `[modules.preprocessor]`, `[modules.processor]`, and `[modules.postprocessor]`. Note that an `injector` needs to be specified in an array of tables since we can specify multiple `injector`s.
 
 ```toml
 [modules]
@@ -220,12 +221,11 @@ Each module is specified with the name and the path of the class file on `[modul
 ```
 
 ## [common]
-`[common]` is reserved for test behavior. All paramters on this `[common]` table are optional.
-You can specify the number of threads which execute `Processor#execute()` by `concurrency`. The default value is 1.
-`run_for_sec` can be used for a run time of your test. The default value is 60.
-`ramp_for_sec` can be used for the time before the measurement, like a warmup. The default value is 0.
-`run_for_sec` and `ramp_for_sec` can be acquired with `Config#getRunForSec()` and `Config#getRampForSec()` in your module.
-`injection_executor` is to choose `InjectionExecutor`. The default value is `com.scalar.kelpie.executor.RandomInjectionExecutor`.
+`[common]` is for reserved static variables that the framework use to change its behavior. All variables on `[common]` table are optional.
+`concurrency` is the number of threads to execute in `Processor#execute()`. The default value is 1.
+`run_for_sec` is the run time of your test. The default value is 60. This value can be retrieved with `Config#getRunForSec()` from your module.
+`ramp_for_sec` is the ramp up time before measurement that can be used for warming up your target system . The default value is 0.  This value can be retrieved with `Config#getRampForSec()` from your module.
+`injection_executor` is where you can specify `InjectionExecutor`. The default value is `com.scalar.kelpie.executor.RandomInjectionExecutor`.
 
 
 ```toml
@@ -236,8 +236,8 @@ You can specify the number of threads which execute `Processor#execute()` by `co
   injection_executor = "com.scalar.kelpie.executor.RandomInjectionExecutor"
 ```
 
-## Your parameters
-You can set your parameters which are used in your modules by adding tables. In the following example, `[my_test]` and `[my_initial_values]` are defined and 3 prameters are set.
+## Static variables in your test
+You can define static variables that can be used in your modules by defining arbitrary named tables. In the following example,  3 static variables are defined in `[my_test]` and `[my_initial_values]` tables.
 
 ```toml
 [my_test]
@@ -248,7 +248,7 @@ You can set your parameters which are used in your modules by adding tables. In 
   balance = 1000
 ```
 
-You can get them by `Config#getUserString(table, name)` and `Config#getUserLong(table, name)`. If you want to get the default value when the specified table or parameter doesn't exists, you use `Config#getUserString(table, name, defaultValue)` or `Config#getUserLong(table, name, defaultValue)`.
+You can get static variables with `Config#getUserString(table, name)` and `Config#getUserLong(table, name)`. If you want to get a default value when a specified table or a static variable doesn't exists, you use `Config#getUserString(table, name, defaultValue)` and `Config#getUserLong(table, name, defaultValue)`.
 
 ```java
   String testName = config.getUserString("my_test", "test_name");
