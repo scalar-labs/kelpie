@@ -199,25 +199,22 @@ A config file consists of at least a table `[modules]`. `[commmon]` is optional,
 
 ## [modules]
 `[modules]` is where you specify what modules to run.
-As the following example shows, each module needs to be specified with the binary name and the path of a class file in a respective table such as `[modules.preprocessor]`, `[modules.processor]`, and `[modules.postprocessor]`. Note that an `injector` needs to be specified in an array of tables since we can specify multiple `injector`s.
+As the following example shows, each module needs to be specified with the binary name and the path of a jar file in a respective table such as `[modules.preprocessor]`, `[modules.processor]`, and `[modules.postprocessor]`. Note that an `injector` needs to be specified in an array of tables since we can specify multiple `injector`s. The example uses the same fat jar file for all modules. But you can specify a different jar file for each module.
 
 ```toml
 [modules]
   [modules.preprocessor]
-    name = "org.my.Preparer"
-    path = "/path/to/preparer"
+    name = "print.PrintPre"
+    path = "print-modules/build/libs/print-modules-all.jar"
   [modules.processor]
-    name = "org.my.Processor"
-    path = "/path/to/processor"
+    name = "print.PrintProcessor"
+    path = "print-modules/build/libs/print-modules-all.jar"
   [modules.postprocessor]
-    name = "org.my.Checker"
-    path = "/path/to/checker"
+    name = "print.PrintPost"
+    path = "print-modules/build/libs/print-modules-all.jar"
   [[modules.injectors]]
-    name = "org.my.Injector1"
-    path = "/path/to/injector1"
-  [[modules.injectors]]
-    name = "org.my.Injector2"
-    path = "/path/to/injector2"
+    name = "print.PrintInjector"
+    path = "print-modules/build/libs/print-modules-all.jar"
 ```
 
 ## [common]
