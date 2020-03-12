@@ -1,6 +1,7 @@
 package print;
 
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.exception.PostProcessException;
 import com.scalar.kelpie.modules.PostProcessor;
 
 public class PrintPost extends PostProcessor {
@@ -18,5 +19,8 @@ public class PrintPost extends PostProcessor {
     System.out.println("Run for " + num + " seconds");
 
     // always succeed
+
+    // for failure
+    //throw new PostProcessException("unexpected result");
   }
 }
