@@ -2,6 +2,7 @@ package com.scalar.kelpie.executor;
 
 import com.google.inject.Inject;
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.exception.PostProcessException;
 import com.scalar.kelpie.modules.Injector;
 import com.scalar.kelpie.modules.PostProcessor;
 import com.scalar.kelpie.modules.PreProcessor;
@@ -49,9 +50,10 @@ public class KelpieExecutor {
       postProcessor.execute();
 
       System.out.println("The test has been completed successfully");
+    } catch (PostProcessException e) {
+      throw e;
     } catch (Exception e) {
-      // TODO: throw another exception
-      throw new RuntimeException("The test Failed", e);
+      throw new RuntimeException("Process failure", e);
     }
   }
 
