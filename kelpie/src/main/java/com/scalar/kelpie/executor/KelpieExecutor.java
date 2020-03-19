@@ -52,7 +52,7 @@ public class KelpieExecutor {
 
       postProcessor.setPreviousState(processor.getState());
       postProcessor.execute();
-      processor.close();
+      postProcessor.close();
 
       System.out.println("The test has been completed successfully");
     } catch (PostProcessException e) {
