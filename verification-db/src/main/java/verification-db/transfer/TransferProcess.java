@@ -18,7 +18,6 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.Json;
-import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 public class TransferProcess extends Processor {
@@ -64,17 +63,18 @@ public class TransferProcess extends Processor {
   }
 
   @Override
-  public JsonObject getState() {
+  public void close() {
     JsonObjectBuilder builder = Json.createObjectBuilder();
     unknownTransactions.forEach(
         (txId, ids) -> {
           builder.add(txId, Json.createArrayBuilder().add(ids.get(0)).add(ids.get(1)).build());
         });
 
-    return Json.createObjectBuilder()
-        .add("committed", committed.get())
-        .add("unknown_transaction", builder.build())
-        .build();
+    this.state =
+        Json.createObjectBuilder()
+            .add("committed", committed.get())
+            .add("unknown_transaction", builder.build())
+            .build();
   }
 
   private void transfer(DistributedTransaction transaction, List<Integer> ids, int amount)

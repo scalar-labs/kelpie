@@ -47,6 +47,9 @@ public class TransferPreparation extends PreProcessor {
     System.out.println("all records have been inserted");
   }
 
+  @Override
+  public void close() {}
+
   private class PopulationRunner {
     private final int id;
 

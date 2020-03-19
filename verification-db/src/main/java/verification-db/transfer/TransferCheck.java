@@ -56,6 +56,9 @@ public class TransferCheck extends PostProcessor {
     }
   }
 
+  @Override
+  public void close() {}
+
   private List<Result> readRecords() {
     int numAccounts = (int) config.getUserLong("test_config", "num_accounts");
     int numTypes = (int) config.getUserLong("test_config", "num_account_types", Common.NUM_TYPES);
@@ -84,7 +87,7 @@ public class TransferCheck extends PostProcessor {
     Coordinator coordinator = new Coordinator(storage);
 
     System.out.println("reading coordinator status...");
-    JsonObject unknownTransactions = this.state.getJsonObject("unknown_transaction");
+    JsonObject unknownTransactions = getPreviousState().getJsonObject("unknown_transaction");
     unknownTransactions.forEach(
         (txId, ids) -> {
           int i = 0;
@@ -118,7 +121,7 @@ public class TransferCheck extends PostProcessor {
   private boolean checkConsistency(List<Result> results) {
     int totalVersion = Common.getActualTotalVersion(results);
     int totalBalance = Common.getActualTotalBalance(results);
-    int expectedTotalVersion = (this.state.getInt("committed") + this.committed) * 2;
+    int expectedTotalVersion = (getPreviousState().getInt("committed") + this.committed) * 2;
     int expectedTotalBalance = Common.getTotalInitialBalance(config);
 
     System.out.println("total version: " + totalVersion);

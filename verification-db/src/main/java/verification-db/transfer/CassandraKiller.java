@@ -65,6 +65,9 @@ public class CassandraKiller extends Injector {
         });
   }
 
+  @Override
+  public void close() {}
+
   private void kill(String address) {
     System.out.println("[killer] Killing cassandra on " + address);
     String killCommand = "sudo pkill -9 -F /var/run/cassandra/cassandra.pid";
