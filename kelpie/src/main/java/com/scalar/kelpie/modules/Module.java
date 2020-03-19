@@ -1,23 +1,29 @@
 package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
-import javax.json.Json;
 import javax.json.JsonObject;
 
-public abstract class Module {
+public abstract class Module implements AutoCloseable {
+  protected static final JsonObject DEFAULT_STATE = JsonObject.EMPTY_JSON_OBJECT;
+
   protected Config config;
   protected JsonObject state;
+  private JsonObject previousState;
 
   public Module(Config config) {
     this.config = config;
-    this.state = Json.createObjectBuilder().build();
+    this.state = DEFAULT_STATE;
   }
 
-  public JsonObject getState() {
+  public final JsonObject getState() {
     return this.state;
   }
 
-  public void setState(JsonObject state) {
-    this.state = state;
+  public final JsonObject getPreviousState() {
+    return this.previousState;
+  }
+
+  public final void setPreviousState(JsonObject previousState) {
+    this.previousState = previousState;
   }
 }

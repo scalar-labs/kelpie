@@ -13,4 +13,7 @@ public class DummyProcessor extends Processor {
   public void execute() {
     // nothing to do
   }
+
+  @Override
+  public void close() {}
 }

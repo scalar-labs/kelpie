@@ -20,9 +20,12 @@ public class PrintPost extends PostProcessor {
     System.out.println("Run for " + num + " seconds");
 
     int expectedTotal = (int) (num * config.getConcurrency());
-    int actualTotal = this.state.getInt("total");
+    int actualTotal = getPreviousState().getInt("total");
     if (expectedTotal != actualTotal) {
       throw new PostProcessException("unexpected result");
     }
   }
+
+  @Override
+  public void close() {}
 }

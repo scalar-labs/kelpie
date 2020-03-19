@@ -13,4 +13,7 @@ public class DummyPostProcessor extends PostProcessor {
   public void execute() {
     // nothing to do
   }
+
+  @Override
+  public void close() {}
 }

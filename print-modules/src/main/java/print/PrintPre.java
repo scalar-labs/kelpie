@@ -19,8 +19,8 @@ public class PrintPre extends PreProcessor {
   }
 
   @Override
-  public JsonObject getState() {
+  public void close() {
     String title = config.getUserString("print_test", "title");
-    return Json.createObjectBuilder().add("title", title).build();
+    this.state = Json.createObjectBuilder().add("title", title).build();
   }
 }

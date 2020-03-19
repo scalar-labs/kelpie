@@ -13,4 +13,7 @@ public class DummyPreProcessor extends PreProcessor {
   public void execute() {
     // nothing to do
   }
+
+  @Override
+  public void close() {}
 }

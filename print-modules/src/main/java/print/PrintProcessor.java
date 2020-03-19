@@ -15,7 +15,7 @@ public class PrintProcessor extends Processor {
 
   @Override
   public void execute() {
-    String preparationTitle = this.state.getString("title");
+    String preparationTitle = getPreviousState().getString("title");
     String title = config.getUserString("print_test", "title");
     if (!preparationTitle.equals(title)) {
       throw new RuntimeException("inconsistent state");
@@ -36,7 +36,7 @@ public class PrintProcessor extends Processor {
   }
 
   @Override
-  public JsonObject getState() {
-    return Json.createObjectBuilder().add("total", total.get()).build();
+  public void close() {
+    this.state = Json.createObjectBuilder().add("total", total.get()).build();
   }
 }

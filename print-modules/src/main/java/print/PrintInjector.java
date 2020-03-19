@@ -35,4 +35,7 @@ public class PrintInjector extends Injector {
 
     System.out.println("[Injector] Dummy ejection");
   }
+
+  @Override
+  public void close() {}
 }

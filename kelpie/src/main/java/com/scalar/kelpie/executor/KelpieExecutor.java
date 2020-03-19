@@ -44,12 +44,15 @@ public class KelpieExecutor {
   public void execute() {
     try {
       preProcessor.execute();
+      preProcessor.close();
 
-      processor.setState(preProcessor.getState());
+      processor.setPreviousState(preProcessor.getState());
       executeConcurrently();
+      processor.close();
 
-      postProcessor.setState(processor.getState());
+      postProcessor.setPreviousState(processor.getState());
       postProcessor.execute();
+      processor.close();
 
       System.out.println("The test has been completed successfully");
     } catch (PostProcessException e) {
@@ -94,6 +97,8 @@ public class KelpieExecutor {
 
     // Wait for completion of the injectors
     injectionFuture.join();
+
+    injectionExecutor.close();
   }
 
   private InjectionExecutor loadInjectionExecutor() {
