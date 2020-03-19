@@ -1,0 +1,28 @@
+[modules]
+  [modules.preprocessor]
+    name = "verification_db.transfer.TransferPreparation"
+    path = "verification-db/build/libs/verification-db-all.jar"
+  [modules.processor]
+    name = "verification_db.transfer.TransferProcess"
+    path = "verification-db/build/libs/verification-db-all.jar"
+  [modules.postprocessor]
+    name = "verification_db.transfer.TransferCheck"
+    path = "verification-db/build/libs/verification-db-all.jar"
+  [[modules.injectors]]
+    name = "verification_db.transfer.CassandraKiller"
+    path = "verification-db/build/libs/verification-db-all.jar"
+
+[common]
+  concurrency = 5
+  run_for_sec = 20
+  ramp_for_sec = 10
+
+[test_config]
+  contact_points = "localhost"
+  num_accounts = 10
+  prep_concurrency = 8
+
+[killer_config]
+  cassandra_user = "centos"
+  ssh_port = 22
+  max_kill_interval_sec = 300
