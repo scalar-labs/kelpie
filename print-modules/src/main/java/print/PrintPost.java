@@ -13,14 +13,16 @@ public class PrintPost extends PostProcessor {
   @Override
   public void execute() {
     String title = config.getUserString("print_test", "title");
+    int concurrency = (int) config.getConcurrency();
     long num = config.getUserLong("print_test", "num");
 
     System.out.println("Checking for " + title);
     System.out.println("Run for " + num + " seconds");
 
-    // always succeed
-
-    // for failure
-    //throw new PostProcessException("unexpected result");
+    int expectedTotal = (int) (num * config.getConcurrency());
+    int actualTotal = this.state.getInt("total");
+    if (expectedTotal != actualTotal) {
+      throw new PostProcessException("unexpected result");
+    }
   }
 }

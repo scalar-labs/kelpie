@@ -45,8 +45,10 @@ public class KelpieExecutor {
     try {
       preProcessor.execute();
 
+      processor.setState(preProcessor.getState());
       executeConcurrently();
 
+      postProcessor.setState(processor.getState());
       postProcessor.execute();
 
       System.out.println("The test has been completed successfully");
