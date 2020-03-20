@@ -70,11 +70,11 @@ public class TransferProcess extends Processor {
           builder.add(txId, Json.createArrayBuilder().add(ids.get(0)).add(ids.get(1)).build());
         });
 
-    this.state =
+    setState(
         Json.createObjectBuilder()
             .add("committed", committed.get())
             .add("unknown_transaction", builder.build())
-            .build();
+            .build());
   }
 
   private void transfer(DistributedTransaction transaction, List<Integer> ids, int amount)
@@ -118,10 +118,6 @@ public class TransferProcess extends Processor {
   }
 
   private void logTxInfo(String status, String txId, List<Integer> ids, int amount) {
-    // if (isBenchmark) {
-    //  return;
-    // }
-
     int fromId = ids.get(0);
     int toId = ids.get(1);
 
