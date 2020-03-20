@@ -7,7 +7,7 @@ public abstract class Module implements AutoCloseable {
   protected static final JsonObject DEFAULT_STATE = JsonObject.EMPTY_JSON_OBJECT;
 
   protected Config config;
-  protected JsonObject state;
+  private JsonObject state;
   private JsonObject previousState;
 
   public Module(Config config) {
@@ -21,6 +21,10 @@ public abstract class Module implements AutoCloseable {
 
   public final JsonObject getPreviousState() {
     return this.previousState;
+  }
+
+  public final void setState(JsonObject state) {
+    this.state = state;
   }
 
   public final void setPreviousState(JsonObject previousState) {

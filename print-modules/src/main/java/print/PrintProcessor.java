@@ -4,7 +4,6 @@ import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.Processor;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.Json;
-import javax.json.JsonObject;
 
 public class PrintProcessor extends Processor {
   private final AtomicInteger total = new AtomicInteger(0);
@@ -37,6 +36,6 @@ public class PrintProcessor extends Processor {
 
   @Override
   public void close() {
-    this.state = Json.createObjectBuilder().add("total", total.get()).build();
+    setState(Json.createObjectBuilder().add("total", total.get()).build());
   }
 }

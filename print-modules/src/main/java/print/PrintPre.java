@@ -3,7 +3,6 @@ package print;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.PreProcessor;
 import javax.json.Json;
-import javax.json.JsonObject;
 
 public class PrintPre extends PreProcessor {
 
@@ -21,6 +20,6 @@ public class PrintPre extends PreProcessor {
   @Override
   public void close() {
     String title = config.getUserString("print_test", "title");
-    this.state = Json.createObjectBuilder().add("title", title).build();
+    setState(Json.createObjectBuilder().add("title", title).build());
   }
 }
