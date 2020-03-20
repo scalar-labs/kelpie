@@ -15,6 +15,8 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '24.1-jre'
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
     implementation group: 'info.picocli', name: 'picocli', version: '4.1.4'
+    implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
+    implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
     testImplementation group: 'junit', name: 'junit', version: '4.13'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.14.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'

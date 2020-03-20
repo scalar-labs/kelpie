@@ -12,4 +12,15 @@ public abstract class InjectionExecutor {
   }
 
   public abstract void execute(AtomicBoolean isDone);
+
+  public void close() {
+    for (Injector injector : injectors) {
+      try {
+        injector.close();
+      } catch (Exception e) {
+        System.err.println(e.getMessage());
+        throw new RuntimeException("An injector failed to close");
+      }
+    }
+  }
 }
