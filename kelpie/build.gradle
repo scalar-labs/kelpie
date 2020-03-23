@@ -17,6 +17,7 @@ dependencies {
     implementation group: 'info.picocli', name: 'picocli', version: '4.1.4'
     implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
     implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testImplementation group: 'junit', name: 'junit', version: '4.13'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.14.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'

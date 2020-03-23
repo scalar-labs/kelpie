@@ -6,6 +6,8 @@ import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.executor.KelpieExecutor;
 import java.io.File;
 import java.util.concurrent.Callable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -14,6 +16,7 @@ import picocli.CommandLine;
     mixinStandardHelpOptions = true,
     version = "kelpie v0.1.0")
 public class Kelpie implements Callable {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Kelpie.class);
 
   @CommandLine.Option(
       names = {"--config"},
@@ -53,6 +56,22 @@ public class Kelpie implements Callable {
 
   @Override
   public Void call() {
+    LOGGER.info("Checking a test config...");
+    Config config = setupConfig();
+
+    LOGGER.info("Loading modules...");
+    Injector injector = Guice.createInjector(new KelpieModule(config));
+    KelpieExecutor executor = injector.getInstance(KelpieExecutor.class);
+
+    LOGGER.info("Starting the test...");
+    executor.execute();
+
+    LOGGER.info("The test has been completed successfully");
+
+    return null;
+  }
+
+  private Config setupConfig() {
     if ((onlyPre && onlyProcess) || (onlyPre && onlyPost) || (onlyProcess && onlyPost)) {
       throw new IllegalArgumentException("You can use only one of --only-* options at once");
     }
@@ -72,11 +91,6 @@ public class Kelpie implements Callable {
       config.enableInjector();
     }
 
-    Injector injector = Guice.createInjector(new KelpieModule(config));
-    KelpieExecutor executor = injector.getInstance(KelpieExecutor.class);
-
-    executor.execute();
-
-    return null;
+    return config;
   }
 }
