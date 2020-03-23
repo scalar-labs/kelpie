@@ -1,4 +1,4 @@
-package verification_db.transfer;
+package verification.db.transfer;
 
 import com.scalar.db.api.DistributedTransaction;
 import com.scalar.db.api.DistributedTransactionManager;
@@ -20,12 +20,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
-public class TransferProcess extends Processor {
+public class TransferProcessor extends Processor {
   private final DistributedTransactionManager manager;
   private final AtomicInteger committed = new AtomicInteger(0);
   private final Map<String, List<Integer>> unknownTransactions = new ConcurrentHashMap<>();
 
-  public TransferProcess(Config config) {
+  public TransferProcessor(Config config) {
     super(config);
     this.manager = Common.getTransactionManager(config);
   }
@@ -134,7 +134,7 @@ public class TransferProcess extends Processor {
             + ((fromId == toId) ? 1 : 0);
 
     message += " amount: " + amount;
-    synchronized (TransferProcess.class) {
+    synchronized (TransferProcessor.class) {
       System.out.println(message);
     }
   }

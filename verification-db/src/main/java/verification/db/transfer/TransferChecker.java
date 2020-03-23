@@ -1,4 +1,4 @@
-package verification_db.transfer;
+package verification.db.transfer;
 
 import com.scalar.db.api.DistributedStorage;
 import com.scalar.db.api.DistributedTransaction;
@@ -6,23 +6,26 @@ import com.scalar.db.api.DistributedTransactionManager;
 import com.scalar.db.api.Get;
 import com.scalar.db.api.Result;
 import com.scalar.db.api.TransactionState;
+import com.scalar.db.exception.transaction.CoordinatorException;
 import com.scalar.db.exception.transaction.CrudException;
 import com.scalar.db.transaction.consensuscommit.Coordinator;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.exception.PostProcessException;
 import com.scalar.kelpie.modules.PostProcessor;
+import io.github.resilience4j.retry.Retry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
-public class TransferCheck extends PostProcessor {
+public class TransferChecker extends PostProcessor {
   private final DistributedTransactionManager manager;
-  private int committed = 0;
 
-  public TransferCheck(Config config) {
+  public TransferChecker(Config config) {
     super(config);
     this.manager = Common.getTransactionManager(config);
   }
@@ -31,28 +34,23 @@ public class TransferCheck extends PostProcessor {
   public void execute() {
     List<Result> results = readRecordsWithRetry();
 
-    checkCoordinatorWithRetry(config);
+    int committed = getNumOfCommittedFromCoordinator(config);
 
-    boolean isConsistent = checkConsistency(results);
-    if (!isConsistent) {
+    if (!isConsistent(results, committed)) {
       throw new PostProcessException("Inconsistency happened!");
     }
   }
 
   public List<Result> readRecordsWithRetry() {
     System.out.println("reading latest records ...");
-    int i = 0;
-    while (true) {
-      if (i >= 10) {
-        throw new RuntimeException("some records can't be recovered");
-      }
-      try {
-        return readRecords();
-      } catch (Exception e) {
-        System.err.println(e.getMessage());
-        ++i;
-        Common.exponentialBackoff(i);
-      }
+
+    Retry retry = Common.getRetry("readRecords");
+    Supplier<List<Result>> decorated = Retry.decorateSupplier(retry, this::readRecords);
+
+    try {
+      return decorated.get();
+    } catch (Exception e) {
+      throw new RuntimeException("Reading records failed repeatedly", e);
     }
   }
 
@@ -82,46 +80,50 @@ public class TransferCheck extends PostProcessor {
     return results;
   }
 
-  public void checkCoordinatorWithRetry(Config config) {
+  private int getNumOfCommittedFromCoordinator(Config config) {
     DistributedStorage storage = Common.getStorage(config);
     Coordinator coordinator = new Coordinator(storage);
 
     System.out.println("reading coordinator status...");
-    JsonObject unknownTransactions = getPreviousState().getJsonObject("unknown_transaction");
-    unknownTransactions.forEach(
-        (txId, ids) -> {
-          int i = 0;
-          while (true) {
-            if (i >= 10) {
-              throw new RuntimeException("some records can't be recovered");
-            }
-            try {
-              Optional<Coordinator.State> state = coordinator.getState(txId);
-              if (state.isPresent() && state.get().getState().equals(TransactionState.COMMITTED)) {
-                System.out.println(
-                    "id: "
-                        + txId
-                        + " from: "
-                        + ((JsonArray) ids).getInt(0)
-                        + " to: "
-                        + ((JsonArray) ids).getInt(1)
-                        + " succeeded, not failed");
-                // we can get the detail of the transaction by the ID if needed
-                this.committed++;
-              }
-              break;
-            } catch (Exception e) {
-              ++i;
-              Common.exponentialBackoff(i);
-            }
+
+    Retry retry = Common.getRetry("checkCoordinator");
+    Function<String, Optional<Coordinator.State>> getState =
+        id -> {
+          try {
+            return coordinator.getState(id);
+          } catch (CoordinatorException e) {
+            // convert the exception for Retry
+            throw new RuntimeException("Failed to read the state from the coordinator", e);
           }
-        });
+        };
+    Function<String, Optional<Coordinator.State>> decorated =
+        Retry.decorateFunction(retry, getState);
+
+    JsonObject unknownTransactions = getPreviousState().getJsonObject("unknown_transaction");
+    int committed = 0;
+    for (String txId : unknownTransactions.keySet()) {
+      Optional<Coordinator.State> state = decorated.apply(txId);
+      if (state.isPresent() && state.get().getState().equals(TransactionState.COMMITTED)) {
+        JsonArray ids = unknownTransactions.getJsonArray(txId);
+        System.out.println(
+            "id: "
+                + txId
+                + " from: "
+                + ids.getInt(0)
+                + " to: "
+                + ids.getInt(1)
+                + " succeeded, not failed");
+        committed++;
+      }
+    }
+
+    return committed;
   }
 
-  private boolean checkConsistency(List<Result> results) {
+  private boolean isConsistent(List<Result> results, int committed) {
     int totalVersion = Common.getActualTotalVersion(results);
     int totalBalance = Common.getActualTotalBalance(results);
-    int expectedTotalVersion = (getPreviousState().getInt("committed") + this.committed) * 2;
+    int expectedTotalVersion = (getPreviousState().getInt("committed") + committed) * 2;
     int expectedTotalBalance = Common.getTotalInitialBalance(config);
 
     System.out.println("total version: " + totalVersion);
@@ -129,15 +131,14 @@ public class TransferCheck extends PostProcessor {
     System.out.println("total balance: " + totalBalance);
     System.out.println("expected total balance: " + expectedTotalBalance);
 
-    boolean isConsistent = true;
     if (totalVersion != expectedTotalVersion) {
       System.out.println("version mismatch !");
-      isConsistent = false;
+      return false;
     }
     if (totalBalance != expectedTotalBalance) {
       System.out.println("balance mismatch !");
-      isConsistent = false;
+      return false;
     }
-    return isConsistent;
+    return true;
   }
 }

@@ -1,4 +1,4 @@
-package verification_db.transfer;
+package verification.db.transfer;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -17,6 +17,9 @@ import com.scalar.db.service.TransactionModule;
 import com.scalar.db.service.TransactionService;
 import com.scalar.db.transaction.consensuscommit.TransactionResult;
 import com.scalar.kelpie.config.Config;
+import io.github.resilience4j.core.IntervalFunction;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
 import java.util.List;
 import java.util.Properties;
 
@@ -26,7 +29,8 @@ class Common {
   private static final String ACCOUNT_ID = "account_id";
   private static final String ACCOUNT_TYPE = "account_type";
   private static final String BALANCE = "balance";
-  private static final long SLEEP_BASE_MILLIS = 100;
+  private static final long SLEEP_BASE_MILLIS = 100L;
+  private static final int MAX_RETRIES = 10;
 
   static final String DEFAULT_CONTACT_POINT = "localhost";
   static final int INITIAL_BALANCE = 10000;
@@ -92,11 +96,11 @@ class Common {
     return results.stream().mapToInt(r -> ((IntValue) r.getValue(BALANCE).get()).get()).sum();
   }
 
-  static void exponentialBackoff(int counter) {
-    try {
-      Thread.sleep((long) Math.pow(2, counter) * SLEEP_BASE_MILLIS);
-    } catch (InterruptedException e) {
-      // ignore
-    }
+  static Retry getRetry(String name) {
+    IntervalFunction intervalFunc = IntervalFunction.ofExponentialBackoff(SLEEP_BASE_MILLIS, 2.0);
+
+    RetryConfig retryConfig =
+        RetryConfig.custom().maxAttempts(MAX_RETRIES).intervalFunction(intervalFunc).build();
+    return Retry.of(name, retryConfig);
   }
 }

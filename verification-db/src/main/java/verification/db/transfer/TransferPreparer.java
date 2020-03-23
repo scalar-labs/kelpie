@@ -1,4 +1,4 @@
-package verification_db.transfer;
+package verification.db.transfer;
 
 import com.scalar.db.api.DistributedTransaction;
 import com.scalar.db.api.DistributedTransactionManager;
@@ -12,13 +12,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-public class TransferPreparation extends PreProcessor {
+public class TransferPreparer extends PreProcessor {
   private static final long DEFAULT_POPULATION_CONCURRENCY = 32L;
   private static final int NUM_PER_TX = 100;
 
   private final DistributedTransactionManager manager;
 
-  public TransferPreparation(Config config) {
+  public TransferPreparer(Config config) {
     super(config);
     this.manager = Common.getTransactionManager(config);
   }
