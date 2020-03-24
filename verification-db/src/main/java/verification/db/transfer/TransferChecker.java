@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.IntStream;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
@@ -62,21 +61,24 @@ public class TransferChecker extends PostProcessor {
     int numTypes = (int) config.getUserLong("test_config", "num_account_types", Common.NUM_TYPES);
     List<Result> results = new ArrayList<>();
 
+    boolean isFailure = false;
     DistributedTransaction transaction = manager.start();
-    IntStream.range(0, numAccounts)
-        .forEach(
-            i -> {
-              IntStream.range(0, numTypes)
-                  .forEach(
-                      j -> {
-                        Get get = Common.prepareGet(i, j);
-                        try {
-                          transaction.get(get).ifPresent(r -> results.add(r));
-                        } catch (CrudException e) {
-                          throw new RuntimeException(e);
-                        }
-                      });
-            });
+    for (int i = 0; i < numAccounts; i++) {
+      for (int j = 0; j < numTypes; j++) {
+        Get get = Common.prepareGet(i, j);
+        try {
+          transaction.get(get).ifPresent(r -> results.add(r));
+        } catch (CrudException e) {
+          // continue to read other records
+          isFailure = true;
+        }
+      }
+    }
+
+    if (isFailure) {
+      throw new RuntimeException("at least 1 record couldn't be read");
+    }
+
     return results;
   }
 
