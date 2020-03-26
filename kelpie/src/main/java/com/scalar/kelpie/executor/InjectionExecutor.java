@@ -1,5 +1,6 @@
 package com.scalar.kelpie.executor;
 
+import com.scalar.kelpie.exception.InjectionException;
 import com.scalar.kelpie.modules.Injector;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -18,8 +19,7 @@ public abstract class InjectionExecutor {
       try {
         injector.close();
       } catch (Exception e) {
-        System.err.println(e.getMessage());
-        throw new RuntimeException("An injector failed to close");
+        throw new InjectionException("An injector failed to close", e);
       }
     }
   }

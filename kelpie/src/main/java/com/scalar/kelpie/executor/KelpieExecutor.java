@@ -2,6 +2,7 @@ package com.scalar.kelpie.executor;
 
 import com.google.inject.Inject;
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.exception.InjectionException;
 import com.scalar.kelpie.exception.PostProcessException;
 import com.scalar.kelpie.modules.Injector;
 import com.scalar.kelpie.modules.PostProcessor;
@@ -53,8 +54,6 @@ public class KelpieExecutor {
       postProcessor.setPreviousState(processor.getState());
       postProcessor.execute();
       postProcessor.close();
-
-      System.out.println("The test has been completed successfully");
     } catch (PostProcessException e) {
       throw e;
     } catch (Exception e) {
@@ -102,15 +101,15 @@ public class KelpieExecutor {
   }
 
   private InjectionExecutor loadInjectionExecutor() {
+    String name = config.getInjectionExecutor().get();
     try {
-      Class clazz = Class.forName(config.getInjectionExecutor().get());
+      Class clazz = Class.forName(name);
       Class[] types = {List.class};
       Object[] args = {injectors};
 
       return (InjectionExecutor) clazz.getConstructor(types).newInstance(args);
     } catch (Exception e) {
-      // TODO: throw another exception
-      throw new RuntimeException("Loading InjectionExecutor failed", e);
+      throw new InjectionException("Failed to load InjectionExecutor " + name, e);
     }
   }
 }

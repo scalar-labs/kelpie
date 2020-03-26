@@ -16,8 +16,8 @@ public class PrintPost extends PostProcessor {
     int concurrency = (int) config.getConcurrency();
     long num = config.getUserLong("print_test", "num");
 
-    System.out.println("Checking for " + title);
-    System.out.println("Run for " + num + " seconds");
+    logInfo("Checking for " + title);
+    logInfo("Run for " + num + " seconds");
 
     int expectedTotal = (int) (num * config.getConcurrency());
     int actualTotal = getPreviousState().getInt("total");
