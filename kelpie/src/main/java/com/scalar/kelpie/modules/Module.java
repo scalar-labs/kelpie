@@ -38,19 +38,39 @@ public abstract class Module implements AutoCloseable {
     logger.trace(message);
   }
 
+  protected void logTrace(String message, Throwable e) {
+    logger.trace(message, e);
+  }
+
   protected void logDebug(String message) {
     logger.debug(message);
+  }
+
+  protected void logDebug(String message, Throwable e) {
+    logger.debug(message, e);
   }
 
   protected void logInfo(String message) {
     logger.info(message);
   }
 
+  protected void logInfo(String message, Throwable e) {
+    logger.info(message, e);
+  }
+
   protected void logWarn(String message) {
     logger.warn(message);
   }
 
+  protected void logWarn(String message, Throwable e) {
+    logger.warn(message, e);
+  }
+
   protected void logError(String message) {
     logger.error(message);
+  }
+
+  protected void logError(String message, Throwable e) {
+    logger.error(message, e);
   }
 }

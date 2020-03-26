@@ -53,10 +53,10 @@ public class TransferProcessor extends Processor {
         logSuccess(txId, ids, amount);
         continue;
       } catch (UnknownTransactionStatusException e) {
-        e.printStackTrace();
-        e.getUnknownTransactionId().ifPresent(tx -> unknownTransactions.put(tx, ids));
+        unknownTransactions.put(txId, ids);
+        logWarn("the status of the transaction is unknown: " + txId, e);
       } catch (Exception e) {
-        e.printStackTrace();
+        logWarn(txId + " failed", e);
       }
       logFailure(txId, ids, amount);
     }
@@ -120,7 +120,7 @@ public class TransferProcessor extends Processor {
     int fromId = ids.get(0);
     int toId = ids.get(1);
 
-    String message =
+    logInfo(
         status
             + " - id: "
             + txId
@@ -130,11 +130,8 @@ public class TransferProcessor extends Processor {
             + " to: "
             + toId
             + ","
-            + ((fromId == toId) ? 1 : 0);
-
-    message += " amount: " + amount;
-    synchronized (TransferProcessor.class) {
-      System.out.println(message);
-    }
+            + ((fromId == toId) ? 1 : 0)
+            + " amount: "
+            + amount);
   }
 }

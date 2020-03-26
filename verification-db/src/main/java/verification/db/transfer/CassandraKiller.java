@@ -9,6 +9,7 @@ import com.palantir.giraffe.ssh.PublicKeySshCredential;
 import com.palantir.giraffe.ssh.SshCredential;
 import com.palantir.giraffe.ssh.SshHostAccessor;
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.exception.InjectionException;
 import com.scalar.kelpie.modules.Injector;
 import java.io.File;
 import java.io.IOException;
@@ -79,13 +80,13 @@ public class CassandraKiller extends Injector {
   public void close() {}
 
   private void kill(String node) {
-    System.out.println("[killer] Killing cassandra on " + node);
+    logInfo("Killing cassandra on " + node);
     String killCommand = "pkill -9 -F /var/run/cassandra/cassandra.pid";
     execCommand(node, killCommand);
   }
 
   private void restart(String node) {
-    System.out.println("[killer] Restarting cassandra on " + node);
+    logInfo("Restarting cassandra on " + node);
     String restartCommand = "/etc/init.d/cassandra start";
     execCommand(node, restartCommand);
   }
@@ -98,12 +99,9 @@ public class CassandraKiller extends Injector {
       Arrays.stream(commandStr.split(" ")).forEach(arg -> builder.addArgument(arg));
       Commands.execute(builder.build());
     } catch (CommandException e) {
-      // TODO: after #9
-      // logWarn("kill/restart command failed");
+      logWarn("kill/restart command failed");
     } catch (IOException e) {
-      // TODO: after #9
-      // throw new InjectionException("SSH connection failed", e);
-      throw new RuntimeException("SSH connection failed", e);
+      throw new InjectionException("SSH connection failed", e);
     }
   }
 
@@ -116,9 +114,7 @@ public class CassandraKiller extends Injector {
       try {
         credential = PublicKeySshCredential.fromFile(user, keyPath);
       } catch (IOException e) {
-        // TODO: after #9
-        // throw new InjectionException("Reading a private key failed from " + privateKeyFile, e);
-        throw new RuntimeException("Reading a private key failed from " + privateKeyFile, e);
+        throw new InjectionException("Reading a private key failed from " + privateKeyFile, e);
       }
 
       accessors.put(node, SshHostAccessor.forCredential(Host.fromHostname(node), port, credential));

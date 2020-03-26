@@ -4,6 +4,7 @@ import com.scalar.db.api.DistributedTransaction;
 import com.scalar.db.api.DistributedTransactionManager;
 import com.scalar.db.api.Put;
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.exception.PreProcessException;
 import com.scalar.kelpie.modules.PreProcessor;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class TransferPreparer extends PreProcessor {
 
   @Override
   public void execute() {
-    System.out.println("insert initial values ... ");
+    logInfo("insert initial values... ");
 
     int concurrency =
         (int)
@@ -46,7 +47,7 @@ public class TransferPreparer extends PreProcessor {
             });
 
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
-    System.out.println("all records have been inserted");
+    logInfo("all records have been inserted");
   }
 
   @Override
@@ -78,17 +79,16 @@ public class TransferPreparer extends PreProcessor {
     }
 
     private void populateWithTx(int startId, int endId) {
-      int numTypes = (int) config.getUserLong("test_config", "types", Common.NUM_TYPES);
       int retries = 0;
       while (true) {
         if (retries++ > 10) {
-          throw new RuntimeException("population failed repeatedly!");
+          throw new PreProcessException("population failed repeatedly!");
         }
         DistributedTransaction transaction = manager.start();
         IntStream.range(startId, endId)
             .forEach(
                 i -> {
-                  IntStream.range(0, numTypes)
+                  IntStream.range(0, Common.NUM_TYPES)
                       .forEach(
                           j -> {
                             Put put = Common.preparePut(i, j, Common.INITIAL_BALANCE);

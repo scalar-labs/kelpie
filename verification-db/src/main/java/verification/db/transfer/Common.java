@@ -34,7 +34,7 @@ class Common {
 
   static final String DEFAULT_CONTACT_POINT = "localhost";
   static final int INITIAL_BALANCE = 10000;
-  static final long NUM_TYPES = 2;
+  static final int NUM_TYPES = 2;
 
   static DistributedStorage getStorage(Config config) {
     DatabaseConfig dbConfig = getDatabaseConfig(config);
@@ -84,8 +84,7 @@ class Common {
 
   static int getTotalInitialBalance(Config config) {
     int numAccounts = (int) config.getUserLong("test_config", "num_accounts");
-    int numTypes = (int) config.getUserLong("test_config", "num_account_types", NUM_TYPES);
-    return INITIAL_BALANCE * numTypes * numAccounts;
+    return INITIAL_BALANCE * NUM_TYPES * numAccounts;
   }
 
   static int getActualTotalVersion(List<Result> results) {
