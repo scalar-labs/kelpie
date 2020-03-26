@@ -1,6 +1,5 @@
 package verification.db.transfer;
 
-import com.scalar.db.api.DistributedStorage;
 import com.scalar.db.api.DistributedTransaction;
 import com.scalar.db.api.DistributedTransactionManager;
 import com.scalar.db.api.Get;
@@ -23,10 +22,12 @@ import javax.json.JsonObject;
 
 public class TransferChecker extends PostProcessor {
   private final DistributedTransactionManager manager;
+  private final Coordinator coordinator;
 
   public TransferChecker(Config config) {
     super(config);
     this.manager = Common.getTransactionManager(config);
+    this.coordinator = new Coordinator(Common.getStorage(config));
   }
 
   @Override
@@ -41,7 +42,7 @@ public class TransferChecker extends PostProcessor {
   }
 
   public List<Result> readRecordsWithRetry() {
-    System.out.println("reading latest records ...");
+    logInfo("reading latest records ...");
 
     Retry retry = Common.getRetry("readRecords");
     Supplier<List<Result>> decorated = Retry.decorateSupplier(retry, this::readRecords);
@@ -49,7 +50,7 @@ public class TransferChecker extends PostProcessor {
     try {
       return decorated.get();
     } catch (Exception e) {
-      throw new RuntimeException("Reading records failed repeatedly", e);
+      throw new PostProcessException("Reading records failed repeatedly", e);
     }
   }
 
@@ -58,13 +59,12 @@ public class TransferChecker extends PostProcessor {
 
   private List<Result> readRecords() {
     int numAccounts = (int) config.getUserLong("test_config", "num_accounts");
-    int numTypes = (int) config.getUserLong("test_config", "num_account_types", Common.NUM_TYPES);
     List<Result> results = new ArrayList<>();
 
     boolean isFailed = false;
     DistributedTransaction transaction = manager.start();
     for (int i = 0; i < numAccounts; i++) {
-      for (int j = 0; j < numTypes; j++) {
+      for (int j = 0; j < Common.NUM_TYPES; j++) {
         Get get = Common.prepareGet(i, j);
         try {
           transaction.get(get).ifPresent(r -> results.add(r));
@@ -76,6 +76,7 @@ public class TransferChecker extends PostProcessor {
     }
 
     if (isFailed) {
+      // for Retry
       throw new RuntimeException("at least 1 record couldn't be read");
     }
 
@@ -83,31 +84,22 @@ public class TransferChecker extends PostProcessor {
   }
 
   private int getNumOfCommittedFromCoordinator(Config config) {
-    DistributedStorage storage = Common.getStorage(config);
-    Coordinator coordinator = new Coordinator(storage);
-
-    System.out.println("reading coordinator status...");
-
     Retry retry = Common.getRetry("checkCoordinator");
-    Function<String, Optional<Coordinator.State>> getState =
-        id -> {
-          try {
-            return coordinator.getState(id);
-          } catch (CoordinatorException e) {
-            // convert the exception for Retry
-            throw new RuntimeException("Failed to read the state from the coordinator", e);
-          }
-        };
     Function<String, Optional<Coordinator.State>> decorated =
-        Retry.decorateFunction(retry, getState);
+        Retry.decorateFunction(retry, id -> getState(id));
 
     JsonObject unknownTransactions = getPreviousState().getJsonObject("unknown_transaction");
     int committed = 0;
     for (String txId : unknownTransactions.keySet()) {
-      Optional<Coordinator.State> state = decorated.apply(txId);
+      Optional<Coordinator.State> state;
+      try {
+        state = decorated.apply(txId);
+      } catch (Exception e) {
+        throw new PostProcessException("Reading the status failed repeatedly", e);
+      }
       if (state.isPresent() && state.get().getState().equals(TransactionState.COMMITTED)) {
         JsonArray ids = unknownTransactions.getJsonArray(txId);
-        System.out.println(
+        logInfo(
             "id: "
                 + txId
                 + " from: "
@@ -122,23 +114,34 @@ public class TransferChecker extends PostProcessor {
     return committed;
   }
 
+  private Optional<Coordinator.State> getState(String txId) {
+    try {
+      logInfo("reading the status of " + txId);
+
+      return coordinator.getState(txId);
+    } catch (CoordinatorException e) {
+      // convert the exception for Retry
+      throw new RuntimeException("Failed to read the state from the coordinator", e);
+    }
+  }
+
   private boolean isConsistent(List<Result> results, int committed) {
     int totalVersion = Common.getActualTotalVersion(results);
     int totalBalance = Common.getActualTotalBalance(results);
     int expectedTotalVersion = (getPreviousState().getInt("committed") + committed) * 2;
     int expectedTotalBalance = Common.getTotalInitialBalance(config);
 
-    System.out.println("total version: " + totalVersion);
-    System.out.println("expected total version: " + expectedTotalVersion);
-    System.out.println("total balance: " + totalBalance);
-    System.out.println("expected total balance: " + expectedTotalBalance);
+    logInfo("total version: " + totalVersion);
+    logInfo("expected total version: " + expectedTotalVersion);
+    logInfo("total balance: " + totalBalance);
+    logInfo("expected total balance: " + expectedTotalBalance);
 
     if (totalVersion != expectedTotalVersion) {
-      System.out.println("version mismatch !");
+      logError("version mismatch !");
       return false;
     }
     if (totalBalance != expectedTotalBalance) {
-      System.out.println("balance mismatch !");
+      logError("balance mismatch !");
       return false;
     }
     return true;
