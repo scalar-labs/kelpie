@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 public class TransferPreparer extends PreProcessor {
   private static final long DEFAULT_POPULATION_CONCURRENCY = 32L;
-  private static final int NUM_PER_TX = 100;
+  private static final int NUM_ACCOUNTS_PER_TX = 100;
 
   private final DistributedTransactionManager manager;
 
@@ -28,7 +28,9 @@ public class TransferPreparer extends PreProcessor {
     System.out.println("insert initial values ... ");
 
     int concurrency =
-        (int) config.getUserLong("test_config", "prep_concurrency", DEFAULT_POPULATION_CONCURRENCY);
+        (int)
+            config.getUserLong(
+                "test_config", "population_concurrency", DEFAULT_POPULATION_CONCURRENCY);
     ExecutorService es = Executors.newCachedThreadPool();
     List<CompletableFuture> futures = new ArrayList<>();
     IntStream.range(0, concurrency)
@@ -60,16 +62,17 @@ public class TransferPreparer extends PreProcessor {
     public void run() {
       int concurrency =
           (int)
-              config.getUserLong("test_config", "prep_concurrency", DEFAULT_POPULATION_CONCURRENCY);
+              config.getUserLong(
+                  "test_config", "population_concurrency", DEFAULT_POPULATION_CONCURRENCY);
       int numAccounts = (int) config.getUserLong("test_config", "num_accounts");
       int numPerThread = (numAccounts + concurrency - 1) / concurrency;
       int start = numPerThread * id;
       int end = Math.min(numPerThread * (id + 1), numAccounts);
-      IntStream.range(0, (numPerThread + NUM_PER_TX - 1) / NUM_PER_TX)
+      IntStream.range(0, (numPerThread + NUM_ACCOUNTS_PER_TX - 1) / NUM_ACCOUNTS_PER_TX)
           .forEach(
               i -> {
-                int startId = start + NUM_PER_TX * i;
-                int endId = Math.min(start + NUM_PER_TX * (i + 1), end);
+                int startId = start + NUM_ACCOUNTS_PER_TX * i;
+                int endId = Math.min(start + NUM_ACCOUNTS_PER_TX * (i + 1), end);
                 populateWithTx(startId, endId);
               });
     }

@@ -61,7 +61,7 @@ public class TransferChecker extends PostProcessor {
     int numTypes = (int) config.getUserLong("test_config", "num_account_types", Common.NUM_TYPES);
     List<Result> results = new ArrayList<>();
 
-    boolean isFailure = false;
+    boolean isFailed = false;
     DistributedTransaction transaction = manager.start();
     for (int i = 0; i < numAccounts; i++) {
       for (int j = 0; j < numTypes; j++) {
@@ -70,12 +70,12 @@ public class TransferChecker extends PostProcessor {
           transaction.get(get).ifPresent(r -> results.add(r));
         } catch (CrudException e) {
           // continue to read other records
-          isFailure = true;
+          isFailed = true;
         }
       }
     }
 
-    if (isFailure) {
+    if (isFailed) {
       throw new RuntimeException("at least 1 record couldn't be read");
     }
 

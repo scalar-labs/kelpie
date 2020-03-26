@@ -20,7 +20,7 @@
 [test_config]
   contact_points = "localhost"
   num_accounts = 10
-  prep_concurrency = 8
+  population_concurrency = 8
 
 [killer_config]
   ssh_user = "centos"

@@ -79,7 +79,6 @@ public class TransferProcessor extends Processor {
 
   private void transfer(DistributedTransaction transaction, List<Integer> ids, int amount)
       throws CrudException, CommitException, UnknownTransactionStatusException {
-
     int fromId = ids.get(0);
     int toId = ids.get(1);
     int fromType = 0;
