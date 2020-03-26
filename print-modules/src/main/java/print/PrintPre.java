@@ -14,7 +14,7 @@ public class PrintPre extends PreProcessor {
   public void execute() {
     String title = config.getUserString("print_test", "title");
 
-    System.out.println("Prepare for " + title);
+    logInfo("Prepare for " + title);
   }
 
   @Override

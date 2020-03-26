@@ -21,7 +21,7 @@ public class PrintInjector extends Injector {
       // ignore
     }
 
-    System.out.println("[Injector] Dummy injection");
+    logInfo("Dummy injection");
   }
 
   @Override
@@ -33,7 +33,7 @@ public class PrintInjector extends Injector {
       // ignore
     }
 
-    System.out.println("[Injector] Dummy ejection");
+    logInfo("Dummy ejection");
   }
 
   @Override
