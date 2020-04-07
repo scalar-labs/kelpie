@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import javax.annotation.concurrent.Immutable;
 
+/** KelpieExecutor controls execution of all modules. */
 @Immutable
 public class KelpieExecutor {
   private final Config config;

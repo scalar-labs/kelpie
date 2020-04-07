@@ -5,6 +5,11 @@ import com.scalar.kelpie.modules.Injector;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * A InjectionExecutor abstraction for switching injection execution policies. When multiple {@link
+ * Injector}s are specified, the way they run concurrently is controlled by {@link
+ * InjectionExecutor}.
+ */
 public abstract class InjectionExecutor {
   protected List<Injector> injectors;
 
@@ -12,8 +17,14 @@ public abstract class InjectionExecutor {
     this.injectors = injectors;
   }
 
+  /**
+   * Executes {@link Injector}s.
+   *
+   * @param isDone the execution should finish when this has been set to true
+   */
   public abstract void execute(AtomicBoolean isDone);
 
+  /** Close all {@link Injector}s. */
   public void close() {
     for (Injector injector : injectors) {
       try {

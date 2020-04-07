@@ -2,6 +2,7 @@ package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
 
+/** Processor executes actual tests. */
 public abstract class Processor extends Module {
 
   public Processor(Config config) {

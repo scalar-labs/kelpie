@@ -11,6 +11,10 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ModuleLoader loads modules. If a module isn't specified in the config, ModuleLoader loads a dummy
+ * module for {@link PreProcessor}, {@link Processor} and {@link PostProcessor}.
+ */
 public class ModuleLoader {
   private Config config;
 
