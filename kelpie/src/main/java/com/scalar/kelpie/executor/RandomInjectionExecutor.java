@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/** RandomInjectionExecutor executes {@link Injector}s one by one in a random order. */
 public class RandomInjectionExecutor extends InjectionExecutor {
   private final Random random;
 
