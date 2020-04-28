@@ -9,11 +9,12 @@ import java.util.UUID;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import org.HdrHistogram.ConcurrentHistogram;
 import org.HdrHistogram.Histogram;
 
 public class TransferProcessor extends Processor {
   // 1 ms to 300 seconds with 3 decimal point resolution:
-  private final Histogram histogram = new Histogram(300000L, 3);
+  private final Histogram histogram = new ConcurrentHistogram(300000L, 3);
   private final String transferContractName;
   private int numAccounts;
 
@@ -46,11 +47,19 @@ public class TransferProcessor extends Processor {
     double mean = histogram.getMean();
     double sd = histogram.getStdDeviation();
     long max = histogram.getMaxValue();
-    setState(Json.createObjectBuilder().add("total", (int)total)
-        .add("mean", String.format("%.2f", mean))
-        .add("sd", String.format("%.2f", sd))
-        .add("max", (int)max)
-        .build());
+    long latencyAt90percentile = histogram.getValueAtPercentile(90.0);
+    long latencyAt95percentile = histogram.getValueAtPercentile(95.0);
+    long latencyAt99percentile = histogram.getValueAtPercentile(99.0);
+    setState(
+        Json.createObjectBuilder()
+            .add("total", (int) total)
+            .add("mean", String.format("%.2f", mean))
+            .add("sd", String.format("%.2f", sd))
+            .add("max", (int) max)
+            .add("90percentile", (int) latencyAt90percentile)
+            .add("95percentile", (int) latencyAt95percentile)
+            .add("99percentile", (int) latencyAt99percentile)
+            .build());
   }
 
   private void transfer(ClientService service, Random random, boolean isRecorded) {

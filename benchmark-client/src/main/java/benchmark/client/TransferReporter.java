@@ -18,6 +18,9 @@ public class TransferReporter extends PostProcessor {
     logInfo("Mean: " + result.getString("mean") + " ms");
     logInfo("SD: " + result.getString("sd") + " ms");
     logInfo("Max latency: " + result.getInt("max") + " ms");
+    logInfo("Latency at 90 percentile: " + result.getInt("90percentile") + " ms");
+    logInfo("Latency at 95 percentile: " + result.getInt("95percentile") + " ms");
+    logInfo("Latency at 99 percentile: " + result.getInt("99percentile") + " ms");
   }
 
   @Override
