@@ -13,7 +13,8 @@ public class TransferReporter extends PostProcessor {
   @Override
   public void execute() {
     JsonObject result = getPreviousState();
-    logInfo("TPS: " + (double) result.getInt("total") / config.getRunForSec());
+    double tps = (double) result.getInt("total") / config.getRunForSec();
+    logInfo("Throughput: " + String.format("%.2f", tps) + " TX/s");
     logInfo("Mean: " + result.getString("mean") + " ms");
     logInfo("SD: " + result.getString("sd") + " ms");
     logInfo("Max latency: " + result.getInt("max") + " ms");

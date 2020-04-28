@@ -1,37 +1,29 @@
 [modules]
   [modules.preprocessor]
-    name = "benchmark.client.Preparer"
+    name = "benchmark.client.TransferPreparer"
     path = "benchmark-client/build/libs/benchmark-client-all.jar"
   [modules.processor]
-    name = "benchmark.client.Processor"
+    name = "benchmark.client.TransferProcessor"
     path = "benchmark-client/build/libs/benchmark-client-all.jar"
   [modules.postprocessor]
-    name = "benchmark.client.Reporter"
+    name = "benchmark.client.TransferReporter"
     path = "benchmark-client/build/libs/benchmark-client-all.jar"
-  #[[modules.injectors]]
-  #  name = "benchmark.client.Statistics"
-  #  path = "benchmark-client/build/libs/benchmark-client-all.jar"
 
 [common]
   concurrency = 1
-  run_for_sec = 20
+  run_for_sec = 200
   ramp_for_sec = 10
 
 [test_config]
-  num_accounts = 1000
-  population_concurrency = 8
+  num_accounts = 100000
+  population_concurrency = 32
   population_contract_name = "benchmark.contract.BatchCreate"
   population_contract_path = "benchmark-client/build/classes/java/main/benchmark/contract/BatchCreate.class"
   transfer_contract_name = "benchmark.contract.Transfer"
   transfer_contract_path = "benchmark-client/build/classes/java/main/benchmark/contract/Transfer.class"
 
 [client_config]
-  dl_server = "13.77.163.144"
+  dl_server = "localhost"
   # dl_server_port = 50051
   certificate = "benchmark-client/sample-keys/certificate.pem"
   private_key = "benchmark-client/sample-keys/private-key.pem"
-
-[statistics_config]
-  ssh_user = "centos"
-  ssh_port = 22
-  ssh_private_key = "/home/centos/.ssh/private_key"

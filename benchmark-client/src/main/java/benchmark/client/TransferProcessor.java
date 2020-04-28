@@ -47,8 +47,8 @@ public class TransferProcessor extends Processor {
     double sd = histogram.getStdDeviation();
     long max = histogram.getMaxValue();
     setState(Json.createObjectBuilder().add("total", (int)total)
-        .add("mean", String.valueOf(mean))
-        .add("sd", String.valueOf(sd))
+        .add("mean", String.format("%.2f", mean))
+        .add("sd", String.format("%.2f", sd))
         .add("max", (int)max)
         .build());
   }
