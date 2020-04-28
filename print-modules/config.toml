@@ -11,6 +11,9 @@
   [[modules.injectors]]
     name = "print.PrintInjector"
     path = "print-modules/build/libs/print-modules-all.jar"
+  [[modules.injectors]]
+    name = "print.PrintInjector2"
+    path = "print-modules/build/libs/print-modules-all.jar"
 
 [common]
   concurrency = 4

@@ -29,31 +29,24 @@ public class OnetimeInjectionExecutor extends InjectionExecutor {
           CompletableFuture<Void> future =
               CompletableFuture.runAsync(
                   () -> {
-                    executeInjection(i);
+                    executeInjection(i, isDone);
                   },
                   es);
           futures.add(future);
         });
 
+    CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+  }
+
+  private void executeInjection(Injector injector, AtomicBoolean isDone) {
+    injector.inject();
+
     while (!isDone.get()) {
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
-        // ignored
+        Thread.currentThread().interrupt();
       }
-    }
-    es.shutdownNow();
-
-    CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
-  }
-
-  private synchronized void executeInjection(Injector injector) {
-    injector.inject();
-
-    try {
-      wait();
-    } catch (InterruptedException e) {
-      // ignored
     }
 
     injector.eject();
