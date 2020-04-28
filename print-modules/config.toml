@@ -11,11 +11,15 @@
   [[modules.injectors]]
     name = "print.PrintInjector"
     path = "print-modules/build/libs/print-modules-all.jar"
+  [[modules.injectors]]
+    name = "print.PrintInjector2"
+    path = "print-modules/build/libs/print-modules-all.jar"
 
 [common]
   concurrency = 4
   run_for_sec = 100
   ramp_for_sec = 10
+  injection_executor = "com.scalar.kelpie.executor.OnetimeInjectionExecutor"
 
 [print_test]
   title = "Print test"
