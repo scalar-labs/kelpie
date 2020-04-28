@@ -45,7 +45,7 @@ public class OnetimeInjectionExecutor extends InjectionExecutor {
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
+        // ignored
       }
     }
 
