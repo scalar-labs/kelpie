@@ -14,6 +14,9 @@
   run_for_sec = 200
   ramp_for_sec = 10
 
+[performance_monitor]
+  enabled = true
+
 [test_config]
   num_accounts = 100000
   population_concurrency = 32

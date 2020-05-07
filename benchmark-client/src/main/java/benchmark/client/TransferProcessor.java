@@ -6,15 +6,12 @@ import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.Processor;
 import java.util.Random;
 import java.util.UUID;
+import java.util.function.Supplier;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import org.HdrHistogram.ConcurrentHistogram;
-import org.HdrHistogram.Histogram;
 
 public class TransferProcessor extends Processor {
-  // 1 ms to 300 seconds with 3 decimal point resolution:
-  private final Histogram histogram = new ConcurrentHistogram(300000L, 3);
   private final String transferContractName;
   private int numAccounts;
 
@@ -29,40 +26,18 @@ public class TransferProcessor extends Processor {
     Random random = new Random(System.currentTimeMillis() + Thread.currentThread().getId());
 
     try (ClientService service = Common.getClientService(config)) {
-      long end = System.currentTimeMillis() + config.getRampForSec() * 1000;
-      do {
-        transfer(service, random, false);
-      } while (System.currentTimeMillis() < end);
+      Supplier<Boolean> op = () -> transfer(service, random);
 
-      end = System.currentTimeMillis() + config.getRunForSec() * 1000;
-      do {
-        transfer(service, random, true);
-      } while (System.currentTimeMillis() < end);
+      ramp(op);
+
+      run(op);
     }
   }
 
   @Override
-  public void close() {
-    long total = histogram.getTotalCount();
-    double mean = histogram.getMean();
-    double sd = histogram.getStdDeviation();
-    long max = histogram.getMaxValue();
-    long latencyAt90percentile = histogram.getValueAtPercentile(90.0);
-    long latencyAt95percentile = histogram.getValueAtPercentile(95.0);
-    long latencyAt99percentile = histogram.getValueAtPercentile(99.0);
-    setState(
-        Json.createObjectBuilder()
-            .add("total", (int) total)
-            .add("mean", String.format("%.2f", mean))
-            .add("sd", String.format("%.2f", sd))
-            .add("max", (int) max)
-            .add("90percentile", (int) latencyAt90percentile)
-            .add("95percentile", (int) latencyAt95percentile)
-            .add("99percentile", (int) latencyAt99percentile)
-            .build());
-  }
+  public void close() {}
 
-  private void transfer(ClientService service, Random random, boolean isRecorded) {
+  private boolean transfer(ClientService service, Random random) {
     try {
       long s = System.currentTimeMillis();
 
@@ -71,13 +46,13 @@ public class TransferProcessor extends Processor {
       JsonObject arg = makeArgument(fromId, toId);
       service.executeContract(transferContractName, arg);
 
-      if (isRecorded) {
-        histogram.recordValue(System.currentTimeMillis() - s);
-      }
+      return true;
     } catch (ContractContextException e) {
       logWarn("skip due to the same ID");
+      return false;
     } catch (Exception e) {
       logWarn("contract execution failed", e);
+      return false;
     }
   }
 

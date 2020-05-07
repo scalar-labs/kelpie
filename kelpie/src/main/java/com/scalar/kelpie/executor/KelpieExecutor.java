@@ -8,6 +8,7 @@ import com.scalar.kelpie.modules.Injector;
 import com.scalar.kelpie.modules.PostProcessor;
 import com.scalar.kelpie.modules.PreProcessor;
 import com.scalar.kelpie.modules.Processor;
+import com.scalar.kelpie.monitor.PerformanceMonitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -44,6 +45,12 @@ public class KelpieExecutor {
   }
 
   public void execute() {
+    if (config.isPerformanceMonitorEnabled()) {
+      PerformanceMonitor pm = new PerformanceMonitor(config);
+      processor.setPerformanceMonitor(pm);
+      postProcessor.setPerformanceMonitor(pm);
+    }
+
     try {
       preProcessor.execute();
       preProcessor.close();
