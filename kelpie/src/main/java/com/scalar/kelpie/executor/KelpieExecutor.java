@@ -27,6 +27,7 @@ public class KelpieExecutor {
   private final PostProcessor postProcessor;
   private final List<Injector> injectors;
   private final AtomicBoolean isDone;
+  private final PerformanceMonitor performanceMonitor;
 
   @Inject
   public KelpieExecutor(
@@ -42,13 +43,13 @@ public class KelpieExecutor {
     this.injectors = injectors;
 
     this.isDone = new AtomicBoolean(false);
+    this.performanceMonitor = new PerformanceMonitor(config);
   }
 
   public void execute() {
     if (config.isPerformanceMonitorEnabled()) {
-      PerformanceMonitor pm = new PerformanceMonitor(config);
-      processor.setPerformanceMonitor(pm);
-      postProcessor.setPerformanceMonitor(pm);
+      processor.setPerformanceMonitor(performanceMonitor);
+      postProcessor.setPerformanceMonitor(performanceMonitor);
     }
 
     try {
@@ -71,8 +72,17 @@ public class KelpieExecutor {
 
   private void executeConcurrently() {
     int concurrency = (int) config.getConcurrency();
-    ExecutorService es = Executors.newFixedThreadPool(concurrency + 1);
+    ExecutorService es = Executors.newFixedThreadPool(concurrency + 2);
     List<CompletableFuture> futures = new ArrayList<>();
+
+    // PerformanceMonitor
+    CompletableFuture<Void> pmFuture = null;
+    if (config.isPerformanceMonitorEnabled()) {
+      pmFuture = CompletableFuture.runAsync(
+          () -> {
+              performanceMonitor.monitor(isDone);
+          }, es);
+    }
 
     // Processor
     IntStream.range(0, concurrency)
@@ -99,10 +109,13 @@ public class KelpieExecutor {
     // Wait for completion of all processor.execute()
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
 
-    // Stop the injector gracefully
+    // Stop the injector and the performance monitor gracefully
     isDone.set(true);
 
-    // Wait for completion of the injectors
+    // Wait for completion
+    if (config.isPerformanceMonitorEnabled()) {
+      pmFuture.join();
+    }
     injectionFuture.join();
 
     injectionExecutor.close();

@@ -47,11 +47,8 @@ public class TransferProcessor extends Processor {
       service.executeContract(transferContractName, arg);
 
       return true;
-    } catch (ContractContextException e) {
-      logWarn("skip due to the same ID");
-      return false;
     } catch (Exception e) {
-      logWarn("contract execution failed", e);
+      // contract execution failed
       return false;
     }
   }

@@ -25,6 +25,7 @@ public class ConfigTest {
   static final String WRONG_PARAMETER = "no_parameter";
   static final long ANY_LONG = 100L;
   static final String ANY_STRING = "test";
+  static final long ANY_SIGNIFICANT_DIGITS = 4L;
 
   static final long DEFAULT_RUN_FOR_SEC = 60L;
   static final String WRONG_FILE = "/path/to/config.toml";
@@ -68,7 +69,12 @@ public class ConfigTest {
           + STRING_PARAMETER
           + " = \""
           + ANY_STRING
-          + "\"\n";
+          + "\"\n"
+          + "[performance_monitor]\n"
+          + "  enabled = true\n"
+          + "  significant_digits = "
+          + ANY_SIGNIFICANT_DIGITS
+          + "\n";
 
   @Test
   public void getPreProcessorName_ShouldGetProperly() {
@@ -261,5 +267,41 @@ public class ConfigTest {
               new Config(new File(WRONG_FILE));
             })
         .isInstanceOf(RuntimeException.class);
+  }
+
+  @Test
+  public void isPerformanceMonitorEnabled_NonParameterGiven_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config("[common]");
+
+    // Act
+    boolean isEnabled = config.isPerformanceMonitorEnabled();
+
+    // Assert
+    assertThat(isEnabled).isEqualTo(false);
+  }
+
+  @Test
+  public void isPerformanceMonitorEnabled_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean isEnabled = config.isPerformanceMonitorEnabled();
+
+    // Assert
+    assertThat(isEnabled).isEqualTo(true);
+  }
+
+  @Test
+  public void getSignificantDigits_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    long significantDigits = config.getSignificantDigits();
+
+    // Assert
+    assertThat(significantDigits).isEqualTo(ANY_SIGNIFICANT_DIGITS);
   }
 }

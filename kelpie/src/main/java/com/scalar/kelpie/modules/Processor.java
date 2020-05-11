@@ -15,11 +15,22 @@ public abstract class Processor extends Module {
 
   public abstract void execute();
 
+  /**
+   * Sets {@link com.scalar.kelpie.monitor.PerformanceMonitor}.
+   *
+   * @param monitor {@link com.scalar.kelpie.monitor.PerformanceMonitor}
+   */
   public void setPerformanceMonitor(PerformanceMonitor monitor) {
     this.monitor = monitor;
     this.isMonitored = true;
   }
 
+  /**
+   * Run an {@code operation} repeatedly for {@code ramp_for_sec}. The {@code operation} should be
+   * {@link Supplier} which returns boolean. For ramp up, this return value isn't used.
+   *
+   * @param op {@link Supplier} to execute a task
+   */
   public void ramp(Supplier<Boolean> op) {
     long end = System.currentTimeMillis() + config.getRampForSec() * 1000L;
     do {
@@ -27,6 +38,12 @@ public abstract class Processor extends Module {
     } while (System.currentTimeMillis() < end);
   }
 
+  /**
+   * Run an {@code operation} repeatedly for {@code run_for_sec}. The {@code operation} should be
+   * {@link Supplier} which returns boolean. If this is true, its latency is recorded.
+   *
+   * @param op {@link Supplier} to execute a task
+   */
   public void run(Supplier<Boolean> op) {
     long end = System.currentTimeMillis() + config.getRunForSec() * 1000L;
     do {
