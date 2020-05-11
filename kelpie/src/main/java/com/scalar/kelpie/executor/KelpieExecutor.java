@@ -80,7 +80,7 @@ public class KelpieExecutor {
     if (config.isPerformanceMonitorEnabled()) {
       pmFuture = CompletableFuture.runAsync(
           () -> {
-              performanceMonitor.monitor(isDone);
+              performanceMonitor.runMonitor(isDone);
           }, es);
     }
 

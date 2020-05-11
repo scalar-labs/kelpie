@@ -39,27 +39,44 @@ public class PerformanceMonitor {
    * Returns a throughput to be calculated with recorded latencies.
    *
    * @param runForSec time in second for which latencies are recorded
+   * @return throughput (operation per second)
    */
   public double getThroughput(long runForSec) {
     return round((double) histogram.getTotalCount() / runForSec);
   }
 
-  /** Returns an average latency. */
+  /**
+   * Returns an average latency.
+   *
+   * @return average latency in millisecond
+   */
   public double getMeanLatency() {
     return round(histogram.getMean());
   }
 
-  /** Returns a standard deviation of latencies. */
+  /**
+   * Returns a standard deviation of latencies.
+   *
+   * @return standard deviation of latencies in millisecond
+   */
   public double getStandardDeviation() {
     return round(histogram.getStdDeviation());
   }
 
-  /** Returns the maximum latency. */
+  /**
+   * Returns the maximum latency.
+   *
+   * @return the maximum latency in millisecond
+   */
   public long getMaxLatency() {
     return histogram.getMaxValue();
   }
 
-  /** Returns the minimuim latency. */
+  /**
+   * Returns the minimum latency.
+   *
+   * @return the minimum latency in millisecond
+   */
   public long getMinLatency() {
     return histogram.getMinValue();
   }
@@ -68,18 +85,17 @@ public class PerformanceMonitor {
    * Returns the latency at the given percentile.
    *
    * @param percentile a percentile of latencies
+   * @return a latency at the given percentile in millisecond
    */
   public long getLatencyAtPercentile(double percentile) {
     return histogram.getValueAtPercentile(percentile);
   }
 
-  public void monitor(AtomicBoolean isDone) {
-    MonitorTask task = new MonitorTask(isDone);
-
-    task.run();
-  }
-
-  /** Outputs the summary of the performance. */
+  /**
+   * Outputs a summary of the performance.
+   *
+   * @return a summary of the performance
+   */
   public String getSummary() {
     return "==== Performance Summary ====\n"
         + "Throughput: "
@@ -105,6 +121,17 @@ public class PerformanceMonitor {
         + " ms\n";
   }
 
+  /**
+   * Run a monitor taks to show the throughput per second
+   *
+   * @param isDone if true, other tasks have finished
+   */
+  public void runMonitor(AtomicBoolean isDone) {
+    MonitorTask task = new MonitorTask(isDone);
+
+    task.run();
+  }
+
   private double round(double v) {
     return new BigDecimal(v)
         .round(new MathContext((int) config.getSignificantDigits()))
@@ -124,21 +151,23 @@ public class PerformanceMonitor {
       long waitTime = 1000L;
 
       while (!isDone.get()) {
-        try {
-          Thread.sleep((int) waitTime);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
+        if (waitTime > 0L) {
+          try {
+            Thread.sleep((int) waitTime);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
         }
 
         long currentCount = histogram.getTotalCount();
         long currentTime = System.currentTimeMillis();
 
-        double throughput = (double) (currentCount - prevCount) / (currentTime - prevTime);
+        double throughput = (currentCount - prevCount) * 1000.0 / (currentTime - prevTime);
 
         logger.info("Throughput: " + round(throughput) + " ops");
 
-        prevCount = currentCount;
         waitTime = 2000L - currentTime + prevTime;
+        prevCount = currentCount;
         prevTime = currentTime;
       }
     }
