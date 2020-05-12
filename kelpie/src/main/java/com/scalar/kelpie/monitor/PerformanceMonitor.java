@@ -4,6 +4,7 @@ import com.scalar.kelpie.config.Config;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.HdrHistogram.ConcurrentHistogram;
 import org.HdrHistogram.Histogram;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ public class PerformanceMonitor {
 
   private final Config config;
   private final Histogram histogram;
+  private final AtomicInteger failureCount = new AtomicInteger(0);
 
   /**
    * Constructs a {@code PerformanceMonitor} with {@link Config}.
@@ -35,6 +37,11 @@ public class PerformanceMonitor {
     histogram.recordValue(latencyMillis);
   }
 
+  /** Records a failure. */
+  public void recordFailure() {
+    failureCount.incrementAndGet();
+  }
+
   /**
    * Returns a throughput to be calculated with recorded latencies.
    *
@@ -43,6 +50,15 @@ public class PerformanceMonitor {
    */
   public double getThroughput(long runForSec) {
     return round((double) histogram.getTotalCount() / runForSec);
+  }
+
+  /**
+   * Returns the number of failure.
+   *
+   * @return failure count
+   */
+  public int getFailureCount() {
+    return failureCount.get();
   }
 
   /**
@@ -101,6 +117,9 @@ public class PerformanceMonitor {
         + "Throughput: "
         + getThroughput(config.getRunForSec())
         + " ops\n"
+        + "Failed operations: "
+        + getFailureCount()
+        + "\n"
         + "Mean latency: "
         + getMeanLatency()
         + " ms\n"

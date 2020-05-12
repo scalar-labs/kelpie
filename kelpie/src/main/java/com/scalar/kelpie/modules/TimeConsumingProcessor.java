@@ -13,7 +13,7 @@ public abstract class TimeConsumingProcessor extends Processor {
   /** Runs an {@code operation} repeatedly for {@code run_for_sec} after ramping up. */
   public final void execute() {
     Supplier<Boolean> operation = makeOperation();
-    PerformanceMonitor PerformanceMonitor = getPerformanceMonitor();
+    PerformanceMonitor performanceMonitor = getPerformanceMonitor();
 
     logInfo("Ramping up...");
     long end = System.currentTimeMillis() + config.getRampForSec() * 1000L;
@@ -25,8 +25,12 @@ public abstract class TimeConsumingProcessor extends Processor {
     end = System.currentTimeMillis() + config.getRunForSec() * 1000L;
     do {
       long start = System.currentTimeMillis();
-      if (operation.get() && PerformanceMonitor != null) {
-        PerformanceMonitor.recordLatency(System.currentTimeMillis() - start);
+      if (performanceMonitor != null) {
+        if (operation.get()) {
+          performanceMonitor.recordLatency(System.currentTimeMillis() - start);
+        } else {
+          performanceMonitor.recordFailure();
+        }
       }
     } while (System.currentTimeMillis() < end);
   }
