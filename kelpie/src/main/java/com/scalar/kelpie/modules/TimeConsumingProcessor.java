@@ -15,13 +15,11 @@ public abstract class TimeConsumingProcessor extends Processor {
     Supplier<Boolean> operation = makeOperation();
     PerformanceMonitor performanceMonitor = getPerformanceMonitor();
 
-    logInfo("Ramping up...");
     long end = System.currentTimeMillis() + config.getRampForSec() * 1000L;
     do {
       operation.get();
     } while (System.currentTimeMillis() < end);
 
-    logInfo("Start measuring");
     end = System.currentTimeMillis() + config.getRunForSec() * 1000L;
     do {
       long start = System.currentTimeMillis();
