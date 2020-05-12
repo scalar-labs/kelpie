@@ -1,8 +1,7 @@
-package benchmark.client;
+package benchmark.client.transfer;
 
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.PostProcessor;
-import javax.json.JsonObject;
 
 public class TransferReporter extends PostProcessor {
 
@@ -12,7 +11,7 @@ public class TransferReporter extends PostProcessor {
 
   @Override
   public void execute() {
-    summary();
+    getSummary();
   }
 
   @Override

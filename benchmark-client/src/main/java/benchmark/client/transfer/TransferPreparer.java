@@ -1,5 +1,6 @@
-package benchmark.client;
+package benchmark.client.transfer;
 
+import benchmark.client.Common;
 import com.scalar.dl.client.service.ClientService;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.exception.PreProcessException;
@@ -20,10 +21,10 @@ public class TransferPreparer extends PreProcessor {
   private final int NUM_ACCOUNTS_PER_TX = 100;
   private final int INITIAL_BALANCE = 10000;
 
-  private String populationContractName;
-  private String populationContractPath;
-  private String transferContractName;
-  private String transferContractPath;
+  private final String populationContractName;
+  private final String populationContractPath;
+  private final String transferContractName;
+  private final String transferContractPath;
 
   public TransferPreparer(Config config) {
     super(config);
@@ -52,8 +53,7 @@ public class TransferPreparer extends PreProcessor {
       service.registerContract(
           transferContractName, transferContractName, transferContractPath, Optional.empty());
     } catch (Exception e) {
-      logError("Preparation failed", e);
-      throw e;
+      throw new PreProcessException("Preparation failed a service", e);
     }
   }
 
@@ -68,11 +68,7 @@ public class TransferPreparer extends PreProcessor {
         .forEach(
             i -> {
               CompletableFuture<Void> future =
-                  CompletableFuture.runAsync(
-                      () -> {
-                        new PopulationRunner(i).run();
-                      },
-                      es);
+                  CompletableFuture.runAsync(new PopulationRunner(i), es);
               futures.add(future);
             });
 
@@ -81,7 +77,7 @@ public class TransferPreparer extends PreProcessor {
     logInfo("all assets have been inserted");
   }
 
-  private class PopulationRunner {
+  private class PopulationRunner implements Runnable {
     private final ClientService service;
     private final int threadId;
 
@@ -113,7 +109,7 @@ public class TransferPreparer extends PreProcessor {
       try {
         service.close();
       } catch (Exception e) {
-        throw new PreProcessException("Failed to shutdown a service");
+        throw new PreProcessException("Failed to shutdown a service", e);
       }
     }
 

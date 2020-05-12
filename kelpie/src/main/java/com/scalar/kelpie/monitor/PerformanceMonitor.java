@@ -122,13 +122,16 @@ public class PerformanceMonitor {
   }
 
   /**
-   * Run a monitor taks to show the throughput per second
+   * Run a monitor task to show the throughput per second
    *
    * @param isDone if true, other tasks have finished
    */
   public void runMonitor(AtomicBoolean isDone) {
-    MonitorTask task = new MonitorTask(isDone);
+    if (!config.isProgressThroughputEnabled()) {
+      return;
+    }
 
+    MonitorTask task = new MonitorTask(isDone);
     task.run();
   }
 
@@ -138,13 +141,14 @@ public class PerformanceMonitor {
         .doubleValue();
   }
 
-  private class MonitorTask {
+  private class MonitorTask implements Runnable {
     private AtomicBoolean isDone;
 
     public MonitorTask(AtomicBoolean isDone) {
       this.isDone = isDone;
     }
 
+    @Override
     public void run() {
       long prevCount = 0L;
       long prevTime = System.currentTimeMillis();
@@ -166,6 +170,7 @@ public class PerformanceMonitor {
 
         logger.info("Throughput: " + round(throughput) + " ops");
 
+        // The next waitTime will be 1000 - (currentTime - prevTime - 1000)
         waitTime = 2000L - currentTime + prevTime;
         prevCount = currentCount;
         prevTime = currentTime;

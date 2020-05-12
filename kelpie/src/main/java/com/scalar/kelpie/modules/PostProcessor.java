@@ -14,6 +14,15 @@ public abstract class PostProcessor extends Module {
   public abstract void execute();
 
   /**
+   * Returns {@link com.scalar.kelpie.monitor.PerformanceMonitor}.
+   *
+   * @return monitor {@link com.scalar.kelpie.monitor.PerformanceMonitor}
+   */
+  public PerformanceMonitor getPerformanceMonitor() {
+    return monitor;
+  }
+
+  /**
    * Sets {@link com.scalar.kelpie.monitor.PerformanceMonitor}.
    *
    * @param monitor {@link com.scalar.kelpie.monitor.PerformanceMonitor}
@@ -23,7 +32,7 @@ public abstract class PostProcessor extends Module {
   }
 
   /** Outputs the summary of the performance. */
-  protected void summary() {
+  protected void getSummary() {
     if (!config.isPerformanceMonitorEnabled()) {
       return;
     }

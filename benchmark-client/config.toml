@@ -1,12 +1,12 @@
 [modules]
   [modules.preprocessor]
-    name = "benchmark.client.TransferPreparer"
+    name = "benchmark.client.transfer.TransferPreparer"
     path = "benchmark-client/build/libs/benchmark-client-all.jar"
   [modules.processor]
-    name = "benchmark.client.TransferProcessor"
+    name = "benchmark.client.transfer.TransferProcessor"
     path = "benchmark-client/build/libs/benchmark-client-all.jar"
   [modules.postprocessor]
-    name = "benchmark.client.TransferReporter"
+    name = "benchmark.client.transfer.TransferReporter"
     path = "benchmark-client/build/libs/benchmark-client-all.jar"
 
 [common]
@@ -16,6 +16,7 @@
 
 [performance_monitor]
   enabled = true
+  progress_throughput_enabled = true
 
 [test_config]
   num_accounts = 100000

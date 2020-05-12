@@ -31,6 +31,7 @@ public class Config {
 
   private boolean performanceMonitorEnabled = false;
   private long significantDigits = 3L;
+  private boolean progressThroughputEnabled = false;
 
   private long concurrency = 1L;
   private long runForSec = 60L;
@@ -189,7 +190,7 @@ public class Config {
    * @return true if a PreProcessor is enabled
    */
   public boolean isPreProcessorEnabled() {
-    return preProcessorEnabled;
+    return preProcessorEnabled && preProcessorName.isPresent();
   }
 
   /**
@@ -198,7 +199,7 @@ public class Config {
    * @return true if a Processor is enabled
    */
   public boolean isProcessorEnabled() {
-    return processorEnabled;
+    return processorEnabled && processorName.isPresent();
   }
 
   /**
@@ -207,7 +208,7 @@ public class Config {
    * @return true if a PostProcessor is enabled
    */
   public boolean isPostProcessorEnabled() {
-    return postProcessorEnabled;
+    return postProcessorEnabled && postProcessorName.isPresent();
   }
 
   /**
@@ -226,6 +227,15 @@ public class Config {
    */
   public boolean isPerformanceMonitorEnabled() {
     return performanceMonitorEnabled;
+  }
+
+  /**
+   * Returns true if output of progress throughput is enabled
+   *
+   * @return true if output of progress throughput is enabled
+   */
+  public boolean isProgressThroughputEnabled() {
+    return progressThroughputEnabled;
   }
 
   /** Sets {@link com.scalar.kelpie.modules.PreProcessor} enable. */
@@ -380,13 +390,13 @@ public class Config {
     if (common.getLong("run_for_sec") != null) {
       runForSec = common.getLong("run_for_sec");
       if (runForSec < 0) {
-        throw new IllegalConfigException("common.run_for_sec should be positive or 0");
+        throw new IllegalConfigException("common.run_for_sec can not be negative");
       }
     }
     if (common.getLong("run_for_sec") != null) {
       rampForSec = common.getLong("ramp_for_sec");
       if (rampForSec < 0) {
-        throw new IllegalConfigException("common.ramp_for_sec should be positive or 0");
+        throw new IllegalConfigException("common.ramp_for_sec can not be negative");
       }
     }
     if (common.getString("injection_executor") != null) {
@@ -397,16 +407,20 @@ public class Config {
   }
 
   private void loadPerformanceMonitorConfig() {
-    Toml pm = toml.getTable("performance_monitor");
-    if (pm == null) {
+    Toml performanceMonitor = toml.getTable("performance_monitor");
+    if (performanceMonitor == null) {
       return;
     }
 
-    if (pm.getBoolean("enabled") != null) {
-      performanceMonitorEnabled = pm.getBoolean("enabled");
+    if (performanceMonitor.getBoolean("enabled") != null) {
+      performanceMonitorEnabled = performanceMonitor.getBoolean("enabled");
 
-      if (pm.getLong("significant_digits") != null) {
-        significantDigits = pm.getLong("significant_digits");
+      if (performanceMonitor.getBoolean("progress_throughput_enabled") != null) {
+        progressThroughputEnabled = performanceMonitor.getBoolean("progress_throughput_enabled");
+      }
+
+      if (performanceMonitor.getLong("significant_digits") != null) {
+        significantDigits = performanceMonitor.getLong("significant_digits");
       }
     }
   }
