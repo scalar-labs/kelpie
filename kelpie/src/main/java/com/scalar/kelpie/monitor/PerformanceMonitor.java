@@ -4,7 +4,7 @@ import com.scalar.kelpie.config.Config;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import org.HdrHistogram.ConcurrentHistogram;
 import org.HdrHistogram.Histogram;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ public class PerformanceMonitor {
 
   private final Config config;
   private final Histogram histogram;
-  private final AtomicInteger failureCount = new AtomicInteger(0);
+  private final AtomicLong failureCount = new AtomicLong(0L);
 
   /**
    * Constructs a {@code PerformanceMonitor} with {@link Config}.
@@ -57,7 +57,7 @@ public class PerformanceMonitor {
    *
    * @return failure count
    */
-  public int getFailureCount() {
+  public long getFailureCount() {
     return failureCount.get();
   }
 
@@ -172,6 +172,7 @@ public class PerformanceMonitor {
       long prevCount = 0L;
       long prevTime = System.currentTimeMillis();
       long waitTime = 1000L;
+      long prevFailures = 0L;
 
       while (!isDone.get()) {
         if (waitTime > 0L) {
@@ -184,15 +185,18 @@ public class PerformanceMonitor {
 
         long currentCount = histogram.getTotalCount();
         long currentTime = System.currentTimeMillis();
+        long currentFailures = getFailureCount();
 
         double throughput = (currentCount - prevCount) * 1000.0 / (currentTime - prevTime);
+        long failures = currentFailures - prevFailures;
 
-        logger.info("Throughput: " + round(throughput) + " ops");
+        logger.info("Throughput: " + round(throughput) + " ops " + "Failed: " + failures);
 
         // The next waitTime will be 1000 - (currentTime - prevTime - 1000)
         waitTime = 2000L - currentTime + prevTime;
         prevCount = currentCount;
         prevTime = currentTime;
+        prevFailures = currentFailures;
       }
     }
   }
