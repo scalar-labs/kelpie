@@ -1,15 +1,35 @@
 package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.stats.Stats;
 
 /** Processor executes actual tests. */
 public abstract class Processor extends Module {
+  private Stats stats;
 
   public Processor(Config config) {
     super(config);
   }
 
   public abstract void execute();
+
+  /**
+   * Returns {@link com.scalar.kelpie.stats.Stats}.
+   *
+   * @return stats {@link com.scalar.kelpie.stats.Stats}
+   */
+  public Stats getStats() {
+    return stats;
+  }
+
+  /**
+   * Sets {@link com.scalar.kelpie.stats.Stats}.
+   *
+   * @param stats {@link com.scalar.kelpie.stats.Stats}
+   */
+  public void setStats(Stats stats) {
+    this.stats = stats;
+  }
 
   @Override
   protected void logTrace(String message) {

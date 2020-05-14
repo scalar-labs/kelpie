@@ -8,6 +8,7 @@ import com.scalar.kelpie.modules.Injector;
 import com.scalar.kelpie.modules.PostProcessor;
 import com.scalar.kelpie.modules.PreProcessor;
 import com.scalar.kelpie.modules.Processor;
+import com.scalar.kelpie.stats.Stats;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +27,7 @@ public class KelpieExecutor {
   private final PostProcessor postProcessor;
   private final List<Injector> injectors;
   private final AtomicBoolean isDone;
+  private final Stats stats;
 
   @Inject
   public KelpieExecutor(
@@ -41,9 +43,13 @@ public class KelpieExecutor {
     this.injectors = injectors;
 
     this.isDone = new AtomicBoolean(false);
+    this.stats = new Stats(config);
   }
 
   public void execute() {
+    processor.setStats(stats);
+    postProcessor.setStats(stats);
+
     try {
       preProcessor.execute();
       preProcessor.close();
@@ -64,8 +70,14 @@ public class KelpieExecutor {
 
   private void executeConcurrently() {
     int concurrency = (int) config.getConcurrency();
-    ExecutorService es = Executors.newFixedThreadPool(concurrency + 1);
+    ExecutorService es = Executors.newFixedThreadPool(concurrency + 2);
     List<CompletableFuture> futures = new ArrayList<>();
+
+    // Stats
+    CompletableFuture<Void> statsFuture = null;
+    if (config.isRealtimeReportEnabled()) {
+      statsFuture = CompletableFuture.runAsync(stats.new RealtimeReport(isDone), es);
+    }
 
     // Processor
     IntStream.range(0, concurrency)
@@ -92,10 +104,13 @@ public class KelpieExecutor {
     // Wait for completion of all processor.execute()
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
 
-    // Stop the injector gracefully
+    // Stop the injector and the Stats gracefully
     isDone.set(true);
 
-    // Wait for completion of the injectors
+    // Wait for completion
+    if (config.isRealtimeReportEnabled()) {
+      statsFuture.join();
+    }
     injectionFuture.join();
 
     injectionExecutor.close();

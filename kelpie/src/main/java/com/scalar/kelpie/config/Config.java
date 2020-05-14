@@ -29,9 +29,14 @@ public class Config {
   private boolean postProcessorEnabled = false;
   private boolean injectorEnabled = false;
 
+  private long significantDigits = 3L;
+  private boolean realtimeReportEnabled = false;
+
   private long concurrency = 1L;
   private long runForSec = 60L;
   private long rampForSec = 0L;
+  private long numOperations = 0L;
+  private long numOperationsForRampUp = 0L;
 
   /**
    * Constructs a {@code Config} with toml format text.
@@ -58,7 +63,9 @@ public class Config {
    */
   public Config(Toml toml) {
     this.toml = toml;
-    loadCommon();
+    loadModuleConfig();
+    loadCommonConfig();
+    loadStatsConfig();
   }
 
   /**
@@ -161,6 +168,24 @@ public class Config {
   }
 
   /**
+   * Returns the number of operations for running a test.
+   *
+   * @return number of operations
+   */
+  public long getNumOperations() {
+    return numOperations;
+  }
+
+  /**
+   * Returns the number of operations before running a test.
+   *
+   * @return number of operations
+   */
+  public long getNumOperationsForRampUp() {
+    return numOperationsForRampUp;
+  }
+
+  /**
    * Returns an {@link com.scalar.kelpie.executor.InjectionExecutor} name.
    *
    * @return an {@code Optional} with an Injector executor name
@@ -170,12 +195,21 @@ public class Config {
   }
 
   /**
+   * Returns significant digits for {@link com.scalar.kelpie.stats.Stats}.
+   *
+   * @return significant digits
+   */
+  public long getSignificantDigits() {
+    return significantDigits;
+  }
+
+  /**
    * Returns true if a {@link com.scalar.kelpie.modules.PreProcessor} is enabled.
    *
    * @return true if a PreProcessor is enabled
    */
   public boolean isPreProcessorEnabled() {
-    return preProcessorEnabled;
+    return preProcessorEnabled && preProcessorName.isPresent();
   }
 
   /**
@@ -184,7 +218,7 @@ public class Config {
    * @return true if a Processor is enabled
    */
   public boolean isProcessorEnabled() {
-    return processorEnabled;
+    return processorEnabled && processorName.isPresent();
   }
 
   /**
@@ -193,7 +227,7 @@ public class Config {
    * @return true if a PostProcessor is enabled
    */
   public boolean isPostProcessorEnabled() {
-    return postProcessorEnabled;
+    return postProcessorEnabled && postProcessorName.isPresent();
   }
 
   /**
@@ -203,6 +237,15 @@ public class Config {
    */
   public boolean isInjectorEnabled() {
     return injectorEnabled;
+  }
+
+  /**
+   * Returns true if output of progress throughput is enabled
+   *
+   * @return true if output of progress throughput is enabled
+   */
+  public boolean isRealtimeReportEnabled() {
+    return realtimeReportEnabled;
   }
 
   /** Sets {@link com.scalar.kelpie.modules.PreProcessor} enable. */
@@ -323,26 +366,31 @@ public class Config {
     return t;
   }
 
-  private void loadCommon() {
+  private void loadModuleConfig() {
     Toml modules = toml.getTable("modules");
-    if (modules != null) {
-      preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
-      processorName = Optional.ofNullable(modules.getString("processor.name"));
-      postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
-      preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
-      processorPath = Optional.ofNullable(modules.getString("processor.path"));
-      postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
-
-      List<Toml> injectorsTable = modules.getTables("injectors");
-      if (injectorsTable != null) {
-        injectorsTable.forEach(
-            i -> {
-              injectors.put(i.getString("name"), i.getString("path"));
-            });
-      }
+    if (modules == null) {
+      return;
     }
 
+    preProcessorName = Optional.ofNullable(modules.getString("preprocessor.name"));
+    processorName = Optional.ofNullable(modules.getString("processor.name"));
+    postProcessorName = Optional.ofNullable(modules.getString("postprocessor.name"));
+    preProcessorPath = Optional.ofNullable(modules.getString("preprocessor.path"));
+    processorPath = Optional.ofNullable(modules.getString("processor.path"));
+    postProcessorPath = Optional.ofNullable(modules.getString("postprocessor.path"));
+
+    List<Toml> injectorsTable = modules.getTables("injectors");
+    if (injectorsTable != null) {
+      injectorsTable.forEach(
+          i -> {
+            injectors.put(i.getString("name"), i.getString("path"));
+          });
+    }
+  }
+
+  private void loadCommonConfig() {
     Toml common = toml.getTable("common");
+
     if (common.getLong("concurrency") != null) {
       concurrency = common.getLong("concurrency");
       if (concurrency <= 0) {
@@ -351,20 +399,47 @@ public class Config {
     }
     if (common.getLong("run_for_sec") != null) {
       runForSec = common.getLong("run_for_sec");
-      if (runForSec <= 0) {
-        throw new IllegalConfigException("common.run_for_sec should be positive");
+      if (runForSec < 0) {
+        throw new IllegalConfigException("common.run_for_sec can not be negative");
       }
     }
-    if (common.getLong("run_for_sec") != null) {
+    if (common.getLong("ramp_for_sec") != null) {
       rampForSec = common.getLong("ramp_for_sec");
-      if (rampForSec <= 0) {
-        throw new IllegalConfigException("common.ramp_for_sec should be positive");
+      if (rampForSec < 0) {
+        throw new IllegalConfigException("common.ramp_for_sec can not be negative");
+      }
+    }
+    if (common.getLong("num_operations") != null) {
+      numOperations = common.getLong("num_operations");
+      if (numOperations < 0) {
+        throw new IllegalConfigException("common.num_operations can not be negative");
+      }
+    }
+    if (common.getLong("num_operations_for_ramp") != null) {
+      numOperationsForRampUp = common.getLong("num_operations_for_ramp");
+      if (numOperationsForRampUp < 0) {
+        throw new IllegalConfigException("common.num_operations_for_ramp can not be negative");
       }
     }
     if (common.getString("injection_executor") != null) {
       injectionExecutor = Optional.of(common.getString("injection_executor"));
     } else {
       injectionExecutor = Optional.of(DEFAULT_INJECTION_EXECUTOR);
+    }
+  }
+
+  private void loadStatsConfig() {
+    Toml stats = toml.getTable("stats");
+    if (stats == null) {
+      return;
+    }
+
+    if (stats.getBoolean("realtime_report_enabled") != null) {
+      realtimeReportEnabled = stats.getBoolean("realtime_report_enabled");
+    }
+
+    if (stats.getLong("significant_digits") != null) {
+      significantDigits = stats.getLong("significant_digits");
     }
   }
 }

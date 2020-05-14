@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library-distribution'
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly project(':kelpie')
+    implementation group: 'com.scalar-labs', name: 'scalardl-java-client-sdk', version: '2.0.5'
+}
