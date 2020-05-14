@@ -14,13 +14,14 @@
   run_for_sec = 200
   ramp_for_sec = 10
 
-[performance_monitor]
-  enabled = true
-  progress_throughput_enabled = true
+[stats]
+  realtime_report_enabled = true
 
 [test_config]
   num_accounts = 100000
   population_concurrency = 32
+
+[contract]
   population_contract_name = "benchmark.contract.BatchCreate"
   population_contract_path = "benchmark-client/build/classes/java/main/benchmark/contract/BatchCreate.class"
   transfer_contract_name = "benchmark.contract.Transfer"

@@ -8,7 +8,7 @@ import com.scalar.kelpie.modules.Injector;
 import com.scalar.kelpie.modules.PostProcessor;
 import com.scalar.kelpie.modules.PreProcessor;
 import com.scalar.kelpie.modules.Processor;
-import com.scalar.kelpie.monitor.PerformanceMonitor;
+import com.scalar.kelpie.stats.Stats;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +27,7 @@ public class KelpieExecutor {
   private final PostProcessor postProcessor;
   private final List<Injector> injectors;
   private final AtomicBoolean isDone;
-  private final PerformanceMonitor performanceMonitor;
+  private final Stats stats;
 
   @Inject
   public KelpieExecutor(
@@ -43,14 +43,12 @@ public class KelpieExecutor {
     this.injectors = injectors;
 
     this.isDone = new AtomicBoolean(false);
-    this.performanceMonitor = new PerformanceMonitor(config);
+    this.stats = new Stats(config);
   }
 
   public void execute() {
-    if (config.isPerformanceMonitorEnabled()) {
-      processor.setPerformanceMonitor(performanceMonitor);
-      postProcessor.setPerformanceMonitor(performanceMonitor);
-    }
+    processor.setStats(stats);
+    postProcessor.setStats(stats);
 
     try {
       preProcessor.execute();
@@ -75,14 +73,13 @@ public class KelpieExecutor {
     ExecutorService es = Executors.newFixedThreadPool(concurrency + 2);
     List<CompletableFuture> futures = new ArrayList<>();
 
-    // PerformanceMonitor
-    CompletableFuture<Void> pmFuture = null;
-    if (config.isPerformanceMonitorEnabled()) {
-      pmFuture = CompletableFuture.runAsync(
-          () -> {
-              performanceMonitor.runMonitor(isDone);
-          }, es);
-    }
+    // Stats
+    CompletableFuture<Void> statsFuture =
+        CompletableFuture.runAsync(
+            () -> {
+              stats.runRealtimeReport(isDone);
+            },
+            es);
 
     // Processor
     IntStream.range(0, concurrency)
@@ -109,13 +106,11 @@ public class KelpieExecutor {
     // Wait for completion of all processor.execute()
     CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
 
-    // Stop the injector and the performance monitor gracefully
+    // Stop the injector and the Stats gracefully
     isDone.set(true);
 
     // Wait for completion
-    if (config.isPerformanceMonitorEnabled()) {
-      pmFuture.join();
-    }
+    statsFuture.join();
     injectionFuture.join();
 
     injectionExecutor.close();

@@ -1,7 +1,7 @@
 package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
-import com.scalar.kelpie.monitor.PerformanceMonitor;
+import com.scalar.kelpie.stats.Stats;
 import java.util.function.Supplier;
 import java.util.stream.LongStream;
 
@@ -13,7 +13,7 @@ public abstract class FrequencyBasedProcessor extends Processor {
 
   /** Runs an {@code operation} repeatedly by {@code num_operations} after ramping up. */
   public final void execute() {
-    PerformanceMonitor performanceMonitor = getPerformanceMonitor();
+    Stats stats = getStats();
 
     Supplier<Boolean> operation =
         () -> {
@@ -33,11 +33,11 @@ public abstract class FrequencyBasedProcessor extends Processor {
         .forEach(
             i -> {
               long start = System.currentTimeMillis();
-              if (performanceMonitor != null) {
+              if (stats != null) {
                 if (operation.get()) {
-                  performanceMonitor.recordLatency(System.currentTimeMillis() - start);
+                  stats.recordLatency(System.currentTimeMillis() - start);
                 } else {
-                  performanceMonitor.recordFailure();
+                  stats.recordFailure();
                 }
               }
             });

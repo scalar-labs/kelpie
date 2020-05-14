@@ -29,10 +29,10 @@ public class TransferPreparer extends PreProcessor {
   public TransferPreparer(Config config) {
     super(config);
 
-    populationContractName = config.getUserString("test_config", "population_contract_name");
-    populationContractPath = config.getUserString("test_config", "population_contract_path");
-    transferContractName = config.getUserString("test_config", "transfer_contract_name");
-    transferContractPath = config.getUserString("test_config", "transfer_contract_path");
+    populationContractName = config.getUserString("contract", "population_contract_name");
+    populationContractPath = config.getUserString("contract", "population_contract_path");
+    transferContractName = config.getUserString("contract", "transfer_contract_name");
+    transferContractPath = config.getUserString("contract", "transfer_contract_path");
   }
 
   @Override

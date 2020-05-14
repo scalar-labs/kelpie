@@ -1,7 +1,7 @@
 package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
-import com.scalar.kelpie.monitor.PerformanceMonitor;
+import com.scalar.kelpie.stats.Stats;
 import java.util.function.Supplier;
 
 /** TimeBasedProcessor executes actual tests for the configured time. */
@@ -12,7 +12,7 @@ public abstract class TimeBasedProcessor extends Processor {
 
   /** Runs an {@code operation} repeatedly for {@code run_for_sec} after ramping up. */
   public final void execute() {
-    PerformanceMonitor performanceMonitor = getPerformanceMonitor();
+    Stats stats = getStats();
 
     Supplier<Boolean> operation =
         () -> {
@@ -32,11 +32,11 @@ public abstract class TimeBasedProcessor extends Processor {
     end = System.currentTimeMillis() + config.getRunForSec() * 1000L;
     do {
       long start = System.currentTimeMillis();
-      if (performanceMonitor != null) {
+      if (stats != null) {
         if (operation.get()) {
-          performanceMonitor.recordLatency(System.currentTimeMillis() - start);
+          stats.recordLatency(System.currentTimeMillis() - start);
         } else {
-          performanceMonitor.recordFailure();
+          stats.recordFailure();
         }
       }
     } while (System.currentTimeMillis() < end);

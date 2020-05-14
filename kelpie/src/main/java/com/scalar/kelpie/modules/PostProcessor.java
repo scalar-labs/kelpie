@@ -1,11 +1,11 @@
 package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
-import com.scalar.kelpie.monitor.PerformanceMonitor;
+import com.scalar.kelpie.stats.Stats;
 
 /** PostProcessor executes some tasks after {@link Processor#execute()} finishes. */
 public abstract class PostProcessor extends Module {
-  private PerformanceMonitor monitor;
+  private Stats stats;
 
   public PostProcessor(Config config) {
     super(config);
@@ -14,29 +14,29 @@ public abstract class PostProcessor extends Module {
   public abstract void execute();
 
   /**
-   * Returns {@link com.scalar.kelpie.monitor.PerformanceMonitor}.
+   * Returns {@link com.scalar.kelpie.stats.Stats}.
    *
-   * @return monitor {@link com.scalar.kelpie.monitor.PerformanceMonitor}
+   * @return stats {@link com.scalar.kelpie.stats.Stats}
    */
-  public PerformanceMonitor getPerformanceMonitor() {
-    return monitor;
+  public Stats getStats() {
+    return stats;
   }
 
   /**
-   * Sets {@link com.scalar.kelpie.monitor.PerformanceMonitor}.
+   * Sets {@link com.scalar.kelpie.stats.Stats}.
    *
-   * @param monitor {@link com.scalar.kelpie.monitor.PerformanceMonitor}
+   * @param stats {@link com.scalar.kelpie.stats.Stats}
    */
-  public void setPerformanceMonitor(PerformanceMonitor monitor) {
-    this.monitor = monitor;
+  public void setStats(Stats stats) {
+    this.stats = stats;
   }
 
-  /** Outputs the summary of the performance. */
+  /** Outputs the summary of the statistics. */
   protected void getSummary() {
-    if (!config.isPerformanceMonitorEnabled()) {
+    if (stats == null) {
       return;
     }
 
-    logInfo(monitor.getSummary());
+    logInfo(stats.getSummary());
   }
 }

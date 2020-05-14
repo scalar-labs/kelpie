@@ -70,8 +70,7 @@ public class ConfigTest {
           + " = \""
           + ANY_STRING
           + "\"\n"
-          + "[performance_monitor]\n"
-          + "  enabled = true\n"
+          + "[stats]\n"
           + "  significant_digits = "
           + ANY_SIGNIFICANT_DIGITS
           + "\n";
@@ -267,30 +266,6 @@ public class ConfigTest {
               new Config(new File(WRONG_FILE));
             })
         .isInstanceOf(RuntimeException.class);
-  }
-
-  @Test
-  public void isPerformanceMonitorEnabled_NonParameterGiven_ShouldGetProperly() {
-    // Arrange
-    Config config = new Config("[common]");
-
-    // Act
-    boolean isEnabled = config.isPerformanceMonitorEnabled();
-
-    // Assert
-    assertThat(isEnabled).isEqualTo(false);
-  }
-
-  @Test
-  public void isPerformanceMonitorEnabled_ShouldGetProperly() {
-    // Arrange
-    Config config = new Config(tomlText);
-
-    // Act
-    boolean isEnabled = config.isPerformanceMonitorEnabled();
-
-    // Assert
-    assertThat(isEnabled).isEqualTo(true);
   }
 
   @Test

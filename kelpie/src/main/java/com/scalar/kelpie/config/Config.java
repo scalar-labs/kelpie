@@ -29,9 +29,8 @@ public class Config {
   private boolean postProcessorEnabled = false;
   private boolean injectorEnabled = false;
 
-  private boolean performanceMonitorEnabled = false;
   private long significantDigits = 3L;
-  private boolean progressThroughputEnabled = false;
+  private boolean realtimeReportEnabled = false;
 
   private long concurrency = 1L;
   private long runForSec = 60L;
@@ -66,7 +65,7 @@ public class Config {
     this.toml = toml;
     loadModuleConfig();
     loadCommonConfig();
-    loadPerformanceMonitorConfig();
+    loadStatsConfig();
   }
 
   /**
@@ -196,7 +195,7 @@ public class Config {
   }
 
   /**
-   * Returns significant digits for {@link com.scalar.kelpie.monitor.PerformanceMonitor}.
+   * Returns significant digits for {@link com.scalar.kelpie.stats.Stats}.
    *
    * @return significant digits
    */
@@ -241,21 +240,12 @@ public class Config {
   }
 
   /**
-   * Returns true if a {@link com.scalar.kelpie.monitor.PerformanceMonitor} is enabled.
-   *
-   * @return true if PerformanceMonitor is enabled
-   */
-  public boolean isPerformanceMonitorEnabled() {
-    return performanceMonitorEnabled;
-  }
-
-  /**
    * Returns true if output of progress throughput is enabled
    *
    * @return true if output of progress throughput is enabled
    */
-  public boolean isProgressThroughputEnabled() {
-    return progressThroughputEnabled;
+  public boolean isRealtimeReportEnabled() {
+    return realtimeReportEnabled;
   }
 
   /** Sets {@link com.scalar.kelpie.modules.PreProcessor} enable. */
@@ -438,22 +428,18 @@ public class Config {
     }
   }
 
-  private void loadPerformanceMonitorConfig() {
-    Toml performanceMonitor = toml.getTable("performance_monitor");
-    if (performanceMonitor == null) {
+  private void loadStatsConfig() {
+    Toml stats = toml.getTable("stats");
+    if (stats == null) {
       return;
     }
 
-    if (performanceMonitor.getBoolean("enabled") != null) {
-      performanceMonitorEnabled = performanceMonitor.getBoolean("enabled");
+    if (stats.getBoolean("realtime_report_enabled") != null) {
+      realtimeReportEnabled = stats.getBoolean("realtime_report_enabled");
+    }
 
-      if (performanceMonitor.getBoolean("progress_throughput_enabled") != null) {
-        progressThroughputEnabled = performanceMonitor.getBoolean("progress_throughput_enabled");
-      }
-
-      if (performanceMonitor.getLong("significant_digits") != null) {
-        significantDigits = performanceMonitor.getLong("significant_digits");
-      }
+    if (stats.getLong("significant_digits") != null) {
+      significantDigits = stats.getLong("significant_digits");
     }
   }
 }

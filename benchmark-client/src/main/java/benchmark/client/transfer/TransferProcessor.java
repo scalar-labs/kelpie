@@ -20,7 +20,7 @@ public class TransferProcessor extends TimeBasedProcessor {
     this.service = Common.getClientService(config);
 
     this.numAccounts = (int) config.getUserLong("test_config", "num_accounts");
-    this.transferContractName = config.getUserString("test_config", "transfer_contract_name");
+    this.transferContractName = config.getUserString("contract", "transfer_contract_name");
   }
 
   @Override

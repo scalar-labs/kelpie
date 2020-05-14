@@ -1,4 +1,4 @@
-package com.scalar.kelpie.monitor;
+package com.scalar.kelpie.stats;
 
 import com.scalar.kelpie.config.Config;
 import java.math.BigDecimal;
@@ -10,8 +10,8 @@ import org.HdrHistogram.Histogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** PerformanceMonitor records latencies and summarize them. */
-public class PerformanceMonitor {
+/** Stats records latencies and summarize them. */
+public class Stats {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final Config config;
@@ -19,11 +19,11 @@ public class PerformanceMonitor {
   private final AtomicLong failureCount = new AtomicLong(0L);
 
   /**
-   * Constructs a {@code PerformanceMonitor} with {@link Config}.
+   * Constructs a {@code Stats} with {@link Config}.
    *
    * @param config {@link Config}
    */
-  public PerformanceMonitor(Config config) {
+  public Stats(Config config) {
     this.config = config;
     this.histogram = new ConcurrentHistogram((int) config.getSignificantDigits());
   }
@@ -108,12 +108,12 @@ public class PerformanceMonitor {
   }
 
   /**
-   * Outputs a summary of the performance.
+   * Outputs a summary of the statistics
    *
-   * @return a summary of the performance
+   * @return a summary of the statistics
    */
   public String getSummary() {
-    return "==== Performance Summary ====\n"
+    return "==== Statistics Summary ====\n"
         + "Throughput: "
         + getThroughput(config.getRunForSec())
         + " ops\n"
@@ -145,13 +145,13 @@ public class PerformanceMonitor {
    *
    * @param isDone if true, other tasks have finished
    */
-  public void runMonitor(AtomicBoolean isDone) {
-    if (!config.isProgressThroughputEnabled()) {
+  public void runRealtimeReport(AtomicBoolean isDone) {
+    if (!config.isRealtimeReportEnabled()) {
       return;
     }
 
-    MonitorTask task = new MonitorTask(isDone);
-    task.run();
+    RealtimeReport report = new RealtimeReport(isDone);
+    report.run();
   }
 
   private double round(double v) {
@@ -160,10 +160,10 @@ public class PerformanceMonitor {
         .doubleValue();
   }
 
-  private class MonitorTask implements Runnable {
+  private class RealtimeReport implements Runnable {
     private AtomicBoolean isDone;
 
-    public MonitorTask(AtomicBoolean isDone) {
+    public RealtimeReport(AtomicBoolean isDone) {
       this.isDone = isDone;
     }
 
