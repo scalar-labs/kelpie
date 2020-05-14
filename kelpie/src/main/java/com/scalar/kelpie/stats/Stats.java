@@ -189,9 +189,9 @@ public class Stats {
             "Throughput: "
                 + round(throughput)
                 + " ops"
-                + " Total success: "
+                + "  Total success: "
                 + getSuccessCount()
-                + " Total failure: "
+                + "  Total failure: "
                 + getFailureCount());
 
         prevCount = currentCount;

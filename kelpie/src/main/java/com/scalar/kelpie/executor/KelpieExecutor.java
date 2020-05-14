@@ -75,7 +75,7 @@ public class KelpieExecutor {
 
     // Stats
     CompletableFuture<Void> statsFuture = null;
-    if (!config.isRealtimeReportEnabled()) {
+    if (config.isRealtimeReportEnabled()) {
       statsFuture = CompletableFuture.runAsync(stats.new RealtimeReport(isDone), es);
     }
 
@@ -108,7 +108,7 @@ public class KelpieExecutor {
     isDone.set(true);
 
     // Wait for completion
-    if (!config.isRealtimeReportEnabled()) {
+    if (config.isRealtimeReportEnabled()) {
       statsFuture.join();
     }
     injectionFuture.join();
