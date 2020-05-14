@@ -53,6 +53,15 @@ public class Stats {
   }
 
   /**
+   * Returns the number of success.
+   *
+   * @return success count
+   */
+  public long getSuccessCount() {
+    return histogram.getTotalCount();
+  }
+
+  /**
    * Returns the number of failure.
    *
    * @return failure count
@@ -117,6 +126,9 @@ public class Stats {
         + "Throughput: "
         + getThroughput(config.getRunForSec())
         + " ops\n"
+        + "Succeeded operations: "
+        + getSuccessCount()
+        + "\n"
         + "Failed operations: "
         + getFailureCount()
         + "\n"
