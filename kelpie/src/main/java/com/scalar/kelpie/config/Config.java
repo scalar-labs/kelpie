@@ -36,6 +36,8 @@ public class Config {
   private long concurrency = 1L;
   private long runForSec = 60L;
   private long rampForSec = 0L;
+  private long numOperations = 0L;
+  private long numOperationsForRampUp = 0L;
 
   /**
    * Constructs a {@code Config} with toml format text.
@@ -164,6 +166,24 @@ public class Config {
    */
   public long getRampForSec() {
     return rampForSec;
+  }
+
+  /**
+   * Returns the number of operations for running a test.
+   *
+   * @return number of operations
+   */
+  public long getNumOperations() {
+    return numOperations;
+  }
+
+  /**
+   * Returns the number of operations before running a test.
+   *
+   * @return number of operations
+   */
+  public long getNumOperationsForRampUp() {
+    return numOperationsForRampUp;
   }
 
   /**
@@ -393,10 +413,22 @@ public class Config {
         throw new IllegalConfigException("common.run_for_sec can not be negative");
       }
     }
-    if (common.getLong("run_for_sec") != null) {
+    if (common.getLong("ramp_for_sec") != null) {
       rampForSec = common.getLong("ramp_for_sec");
       if (rampForSec < 0) {
         throw new IllegalConfigException("common.ramp_for_sec can not be negative");
+      }
+    }
+    if (common.getLong("num_operations") != null) {
+      numOperations = common.getLong("num_operations");
+      if (numOperations < 0) {
+        throw new IllegalConfigException("common.num_operations can not be negative");
+      }
+    }
+    if (common.getLong("num_operations_for_ramp") != null) {
+      numOperationsForRampUp = common.getLong("num_operations_for_ramp");
+      if (numOperationsForRampUp < 0) {
+        throw new IllegalConfigException("common.num_operations_for_ramp can not be negative");
       }
     }
     if (common.getString("injection_executor") != null) {
