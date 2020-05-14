@@ -4,16 +4,25 @@ import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.monitor.PerformanceMonitor;
 import java.util.function.Supplier;
 
-/** TimeConsumingProcessor executes actual tests for the configured time. before exe */
-public abstract class TimeConsumingProcessor extends Processor {
-  public TimeConsumingProcessor(Config config) {
+/** TimeBasedProcessor executes actual tests for the configured time. */
+public abstract class TimeBasedProcessor extends Processor {
+  public TimeBasedProcessor(Config config) {
     super(config);
   }
 
   /** Runs an {@code operation} repeatedly for {@code run_for_sec} after ramping up. */
   public final void execute() {
-    Supplier<Boolean> operation = makeOperation();
     PerformanceMonitor performanceMonitor = getPerformanceMonitor();
+
+    Supplier<Boolean> operation =
+        () -> {
+          try {
+            executeEach();
+            return true;
+          } catch (Exception e) {
+            return false;
+          }
+        };
 
     long end = System.currentTimeMillis() + config.getRampForSec() * 1000L;
     do {
@@ -34,10 +43,9 @@ public abstract class TimeConsumingProcessor extends Processor {
   }
 
   /**
-   * Returns an {@code operation}. The operation should be {@link Supplier} which returns boolean.
-   * If this is true, its latency is recorded.
-   *
-   * @param operation {@link Supplier} to execute a task
+   * Execute some operations. This method is invoked repeatedly in {@link execute()} for {@code
+   * run_for_sec}. If a failure which you don't want to record its latency happens, this method
+   * should throw an exception. The exception will be caught in {@link execute()}.
    */
-  protected abstract Supplier<Boolean> makeOperation();
+  protected abstract void executeEach();
 }

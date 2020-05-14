@@ -171,16 +171,13 @@ public class PerformanceMonitor {
     public void run() {
       long prevCount = 0L;
       long prevTime = System.currentTimeMillis();
-      long waitTime = 1000L;
       long prevFailures = 0L;
 
       while (!isDone.get()) {
-        if (waitTime > 0L) {
-          try {
-            Thread.sleep((int) waitTime);
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-          }
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
         }
 
         long currentCount = histogram.getTotalCount();
@@ -192,8 +189,6 @@ public class PerformanceMonitor {
 
         logger.info("Throughput: " + round(throughput) + " ops " + "Failed: " + failures);
 
-        // The next waitTime will be 1000 - (currentTime - prevTime - 1000)
-        waitTime = 2000L - currentTime + prevTime;
         prevCount = currentCount;
         prevTime = currentTime;
         prevFailures = currentFailures;

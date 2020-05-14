@@ -3,15 +3,14 @@ package benchmark.client.transfer;
 import benchmark.client.Common;
 import com.scalar.dl.client.service.ClientService;
 import com.scalar.kelpie.config.Config;
-import com.scalar.kelpie.modules.TimeConsumingProcessor;
-import java.util.Random;
+import com.scalar.kelpie.modules.TimeBasedProcessor;
 import java.util.UUID;
-import java.util.function.Supplier;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
-public class TransferProcessor extends TimeConsumingProcessor {
+public class TransferProcessor extends TimeBasedProcessor {
   private final String transferContractName;
   private final ClientService service;
   private final int numAccounts;
@@ -25,25 +24,12 @@ public class TransferProcessor extends TimeConsumingProcessor {
   }
 
   @Override
-  public Supplier<Boolean> makeOperation() {
-    Random random = new Random(System.currentTimeMillis() + Thread.currentThread().getId());
+  public void executeEach() {
+    int fromId = ThreadLocalRandom.current().nextInt(numAccounts);
+    int toId = ThreadLocalRandom.current().nextInt(numAccounts);
+    JsonObject arg = makeArgument(fromId, toId);
 
-    Supplier<Boolean> operation =
-        () -> {
-          try {
-            int fromId = random.nextInt(numAccounts);
-            int toId = random.nextInt(numAccounts);
-            JsonObject arg = makeArgument(fromId, toId);
-            service.executeContract(transferContractName, arg);
-
-            return true;
-          } catch (Exception e) {
-            // contract execution failed
-            return false;
-          }
-        };
-
-    return operation;
+    service.executeContract(transferContractName, arg);
   }
 
   @Override
