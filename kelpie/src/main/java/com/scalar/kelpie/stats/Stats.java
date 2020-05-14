@@ -172,7 +172,6 @@ public class Stats {
     public void run() {
       long prevCount = 0L;
       long prevTime = System.currentTimeMillis();
-      long prevFailures = 0L;
 
       while (!isDone.get()) {
         try {
@@ -183,16 +182,20 @@ public class Stats {
 
         long currentCount = histogram.getTotalCount();
         long currentTime = System.currentTimeMillis();
-        long currentFailures = getFailureCount();
 
         double throughput = (currentCount - prevCount) * 1000.0 / (currentTime - prevTime);
-        long failures = currentFailures - prevFailures;
 
-        logger.info("Throughput: " + round(throughput) + " ops " + "Failed: " + failures);
+        logger.info(
+            "Throughput: "
+                + round(throughput)
+                + " ops"
+                + " Total success: "
+                + getSuccessCount()
+                + " Total failure: "
+                + getFailureCount());
 
         prevCount = currentCount;
         prevTime = currentTime;
-        prevFailures = currentFailures;
       }
     }
   }
