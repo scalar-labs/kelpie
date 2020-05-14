@@ -74,12 +74,10 @@ public class KelpieExecutor {
     List<CompletableFuture> futures = new ArrayList<>();
 
     // Stats
-    CompletableFuture<Void> statsFuture =
-        CompletableFuture.runAsync(
-            () -> {
-              stats.runRealtimeReport(isDone);
-            },
-            es);
+    CompletableFuture<Void> statsFuture = null;
+    if (!config.isRealtimeReportEnabled()) {
+      statsFuture = CompletableFuture.runAsync(stats.new RealtimeReport(isDone), es);
+    }
 
     // Processor
     IntStream.range(0, concurrency)
@@ -110,7 +108,9 @@ public class KelpieExecutor {
     isDone.set(true);
 
     // Wait for completion
-    statsFuture.join();
+    if (!config.isRealtimeReportEnabled()) {
+      statsFuture.join();
+    }
     injectionFuture.join();
 
     injectionExecutor.close();

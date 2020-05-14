@@ -44,7 +44,7 @@ public abstract class FrequencyBasedProcessor extends Processor {
   }
 
   /**
-   * Execute some operations. This method is invoked repeatedly in {@link execute()} by {@code
+   * Execute an operation. This method is invoked repeatedly in {@link execute()} by {@code
    * num_operations}. If a failure which you don't want to record its latency happens, this method
    * should throw an exception. The exception will be caught in {@link execute()}.
    */

@@ -10,7 +10,10 @@ import org.HdrHistogram.Histogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Stats records latencies and summarize them. */
+/**
+ * Stats manages some statistics such as success count, failure count, throughput and latencies of
+ * operations.
+ */
 public class Stats {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -152,27 +155,13 @@ public class Stats {
         + " ms\n";
   }
 
-  /**
-   * Run a monitor task to show the throughput per second
-   *
-   * @param isDone if true, other tasks have finished
-   */
-  public void runRealtimeReport(AtomicBoolean isDone) {
-    if (!config.isRealtimeReportEnabled()) {
-      return;
-    }
-
-    RealtimeReport report = new RealtimeReport(isDone);
-    report.run();
-  }
-
   private double round(double v) {
     return new BigDecimal(v)
         .round(new MathContext((int) config.getSignificantDigits()))
         .doubleValue();
   }
 
-  private class RealtimeReport implements Runnable {
+  public class RealtimeReport implements Runnable {
     private AtomicBoolean isDone;
 
     public RealtimeReport(AtomicBoolean isDone) {

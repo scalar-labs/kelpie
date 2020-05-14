@@ -43,7 +43,7 @@ public abstract class TimeBasedProcessor extends Processor {
   }
 
   /**
-   * Execute some operations. This method is invoked repeatedly in {@link execute()} for {@code
+   * Execute an operation. This method is invoked repeatedly in {@link execute()} for {@code
    * run_for_sec}. If a failure which you don't want to record its latency happens, this method
    * should throw an exception. The exception will be caught in {@link execute()}.
    */
