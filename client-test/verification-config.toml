@@ -36,13 +36,12 @@
 
 [client_config]
   dl_server = "localhost"
-  # dl_server_port = 50051
   certificate = "client-test/sample-keys/certificate.pem"
   private_key = "client-test/sample-keys/private-key.pem"
 
 [killer_config]
   ssh_user = "centos"
   ssh_port = 22
-  ssh_private_key = "/home/centos/.ssh/private_key"
-  contact_points = "localhost"
+  ssh_private_key = "/home/centos/.ssh/id_rsa"
   max_kill_interval_sec = 300
+  contact_points = "localhost"

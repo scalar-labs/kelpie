@@ -231,7 +231,7 @@ public class ConfigTest {
     Config config = new Config(tomlText);
 
     // Act
-    long parameter = config.getUserBoolean(MY_CONFIG_TABLE, BOOLEAN_PARAMETER);
+    boolean parameter = config.getUserBoolean(MY_CONFIG_TABLE, BOOLEAN_PARAMETER);
 
     // Assert
     assertThat(parameter).isEqualTo(ANY_BOOLEAN);
@@ -243,7 +243,7 @@ public class ConfigTest {
     Config config = new Config(tomlText);
 
     // Act
-    long parameter = config.getUserBoolean(WRONG_CONFIG_TABLE, BOOLEAN_PARAMETER, ANY_BOOLEAN);
+    boolean parameter = config.getUserBoolean(WRONG_CONFIG_TABLE, BOOLEAN_PARAMETER, ANY_BOOLEAN);
 
     // Assert
     assertThat(parameter).isEqualTo(ANY_BOOLEAN);

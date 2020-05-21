@@ -18,7 +18,6 @@
   realtime_report_enabled = true
 
 [test_config]
-  is_verification = false
   num_accounts = 100000
   population_concurrency = 32
 
@@ -30,6 +29,5 @@
 
 [client_config]
   dl_server = "localhost"
-  # dl_server_port = 50051
-  certificate = "benchmark-client/sample-keys/certificate.pem"
-  private_key = "benchmark-client/sample-keys/private-key.pem"
+  certificate = "client-test/sample-keys/certificate.pem"
+  private_key = "client-test/sample-keys/private-key.pem"
