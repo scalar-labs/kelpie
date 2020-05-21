@@ -47,7 +47,7 @@ public class TransferProcessor extends TimeBasedProcessor {
 
     try {
       service.executeContract(transferContractName, arg);
-    } catch (ClientException e) {
+    } catch (Exception e) {
       logFailure(txId, fromId, toId, amount, e);
       throw e;
     }
@@ -57,7 +57,7 @@ public class TransferProcessor extends TimeBasedProcessor {
 
   @Override
   public void close() {
-    if (!isVerification) {
+    if (isVerification) {
       JsonObjectBuilder builder = Json.createObjectBuilder();
       unknownTransactions.forEach(
           (txId, ids) -> {
@@ -66,6 +66,7 @@ public class TransferProcessor extends TimeBasedProcessor {
 
       setState(Json.createObjectBuilder().add("unknown_transaction", builder.build()).build());
     }
+
     service.close();
   }
 
@@ -103,6 +104,7 @@ public class TransferProcessor extends TimeBasedProcessor {
       logWarn("the status of the transaction is unknown: " + txId, e);
       logTxInfo("unknown", txId, fromId, toId, amount);
     } else {
+      logWarn(txId + " failed", e);
       logTxInfo("failed", txId, fromId, toId, amount);
     }
   }

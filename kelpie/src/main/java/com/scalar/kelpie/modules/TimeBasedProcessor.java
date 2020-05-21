@@ -25,12 +25,12 @@ public abstract class TimeBasedProcessor extends Processor {
         };
 
     long end = System.currentTimeMillis() + config.getRampForSec() * 1000L;
-    do {
+    while (System.currentTimeMillis() < end) {
       operation.get();
-    } while (System.currentTimeMillis() < end);
+    }
 
     end = System.currentTimeMillis() + config.getRunForSec() * 1000L;
-    do {
+    while (System.currentTimeMillis() < end) {
       long start = System.currentTimeMillis();
       if (stats != null) {
         if (operation.get()) {
@@ -39,13 +39,13 @@ public abstract class TimeBasedProcessor extends Processor {
           stats.recordFailure();
         }
       }
-    } while (System.currentTimeMillis() < end);
+    }
   }
 
   /**
-   * Execute an operation. This method is invoked repeatedly in {@link execute()} for {@code
+   * Execute an operation. This method is invoked repeatedly in {@link #execute()} for {@code
    * run_for_sec}. If a failure which you don't want to record its latency happens, this method
-   * should throw an exception. The exception will be caught in {@link execute()}.
+   * should throw an exception. The exception will be caught in {@link #execute()}.
    */
   protected abstract void executeEach();
 }

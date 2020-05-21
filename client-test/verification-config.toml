@@ -6,7 +6,7 @@
     name = "client.transfer.TransferProcessor"
     path = "client-test/build/libs/client-test-all.jar"
   [modules.postprocessor]
-    name = "client.transfer.TransferReporter"
+    name = "client.transfer.TransferChecker"
     path = "client-test/build/libs/client-test-all.jar"
   [[modules.injectors]]
     name = "verification.db.transfer.CassandraKiller"
