@@ -357,6 +357,47 @@ public class Config {
     }
   }
 
+  /**
+   * Returns a boolean value of the user defined variable.
+   *
+   * @param table a table name to specify the variable
+   * @param name a variable name
+   * @return {@code boolean} value of the variable
+   */
+  public boolean getUserBoolean(String table, String name) {
+    return getUserBoolean(table, name, null);
+  }
+
+  /**
+   * Returns a user defined value.
+   *
+   * @param table a table name to specify the variable
+   * @param name a variable name
+   * @param defaultValue a default value if the variable isn't defined
+   * @return {@code boolean} value of the variable
+   */
+  public boolean getUserBoolean(String table, String name, Boolean defaultValue) {
+    final Toml t;
+    try {
+      t = getTable(table);
+    } catch (IllegalConfigException e) {
+      if (defaultValue != null) {
+        return defaultValue;
+      } else {
+        throw e;
+      }
+    }
+
+    Boolean v = t.getBoolean(name);
+    if (v != null) {
+      return v;
+    } else if (defaultValue != null) {
+      return defaultValue;
+    } else {
+      throw new IllegalConfigException(table + "." + name + " doesn't exist");
+    }
+  }
+
   private Toml getTable(String table) {
     Toml t = toml.getTable(table);
     if (t == null) {

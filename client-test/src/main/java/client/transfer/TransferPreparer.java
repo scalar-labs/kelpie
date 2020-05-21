@@ -1,10 +1,11 @@
-package benchmark.client.transfer;
+package client.transfer;
 
-import benchmark.client.Common;
+import client.Common;
 import com.scalar.dl.client.service.ClientService;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.exception.PreProcessException;
 import com.scalar.kelpie.modules.PreProcessor;
+import io.github.resilience4j.retry.Retry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,20 +20,26 @@ import javax.json.JsonObject;
 public class TransferPreparer extends PreProcessor {
   private final long POPULATION_CONCURRENCY = 16L;
   private final int NUM_ACCOUNTS_PER_TX = 100;
-  private final int INITIAL_BALANCE = 10000;
 
   private final String populationContractName;
   private final String populationContractPath;
   private final String transferContractName;
   private final String transferContractPath;
+  private final String balanceContractName;
+  private final String balanceContractPath;
+  private final boolean isVerification;
 
   public TransferPreparer(Config config) {
     super(config);
 
-    populationContractName = config.getUserString("contract", "population_contract_name");
-    populationContractPath = config.getUserString("contract", "population_contract_path");
-    transferContractName = config.getUserString("contract", "transfer_contract_name");
-    transferContractPath = config.getUserString("contract", "transfer_contract_path");
+    this.populationContractName = config.getUserString("contract", "population_contract_name");
+    this.populationContractPath = config.getUserString("contract", "population_contract_path");
+    this.transferContractName = config.getUserString("contract", "transfer_contract_name");
+    this.transferContractPath = config.getUserString("contract", "transfer_contract_path");
+
+    this.isVerification = config.getUserBoolean("test_config", "is_verification", false);
+    this.balanceContractName = config.getUserString("contract", "balance_contract_name", "");
+    this.balanceContractPath = config.getUserString("contract", "balance_contract_path", "");
   }
 
   @Override
@@ -52,6 +59,10 @@ public class TransferPreparer extends PreProcessor {
           populationContractName, populationContractName, populationContractPath, Optional.empty());
       service.registerContract(
           transferContractName, transferContractName, transferContractPath, Optional.empty());
+      if (isVerification) {
+        service.registerContract(
+            balanceContractName, balanceContractName, balanceContractPath, Optional.empty());
+      }
     } catch (Exception e) {
       throw new PreProcessException("Preparation failed a service", e);
     }
@@ -98,49 +109,38 @@ public class TransferPreparer extends PreProcessor {
         return;
       }
 
-      IntStream.range(0, (numPerThread + NUM_ACCOUNTS_PER_TX - 1) / NUM_ACCOUNTS_PER_TX)
-          .forEach(
-              i -> {
-                int startId = start + NUM_ACCOUNTS_PER_TX * i;
-                int endId = Math.min(start + NUM_ACCOUNTS_PER_TX * (i + 1), end);
-                populateWithTx(startId, endId);
-              });
-
       try {
-        service.close();
+        IntStream.range(0, (numPerThread + NUM_ACCOUNTS_PER_TX - 1) / NUM_ACCOUNTS_PER_TX)
+            .forEach(
+                i -> {
+                  int startId = start + NUM_ACCOUNTS_PER_TX * i;
+                  int endId = Math.min(start + NUM_ACCOUNTS_PER_TX * (i + 1), end);
+                  populateWithTx(startId, endId);
+                });
       } catch (Exception e) {
-        throw new PreProcessException("Failed to shutdown a service", e);
+        throw new PreProcessException("Population failed", e);
+      } finally {
+        service.close();
       }
     }
 
     private void populateWithTx(int startId, int endId) {
-      int retries = 0;
-      while (true) {
-        if (retries++ > 10) {
-          logError("population failed repeatedly!");
-          try {
-            service.close();
-          } catch (Exception e) {
-            logError("service close failed");
-            throw e;
-          }
-        }
-        try {
-          JsonObject argument =
-              Json.createObjectBuilder()
-                  .add("start_id", startId)
-                  .add("end_id", endId)
-                  .add("amount", INITIAL_BALANCE)
-                  .add("nonce", UUID.randomUUID().toString())
-                  .build();
+      JsonObject argument =
+          Json.createObjectBuilder()
+              .add("start_id", startId)
+              .add("end_id", endId)
+              .add("amount", Common.INITIAL_BALANCE)
+              .add("nonce", UUID.randomUUID().toString())
+              .build();
+      Runnable populate = () -> service.executeContract(populationContractName, argument);
 
-          service.executeContract(populationContractName, argument);
-
-          // success
-          break;
-        } catch (Exception e) {
-          logWarn("population failed, retry");
-        }
+      Retry retry = Common.getRetryWithFixedWaitDuration("populate");
+      Runnable decorated = Retry.decorateRunnable(retry, populate);
+      try {
+        decorated.run();
+      } catch (Exception e) {
+        logError("population failed repeatedly!");
+        throw e;
       }
     }
   }
