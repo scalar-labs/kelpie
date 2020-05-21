@@ -1,4 +1,4 @@
-package verification.dl.contract;
+package contract;
 
 import com.scalar.dl.ledger.asset.Asset;
 import com.scalar.dl.ledger.contract.Contract;

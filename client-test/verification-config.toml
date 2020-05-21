@@ -1,13 +1,13 @@
 [modules]
   [modules.preprocessor]
     name = "client.transfer.TransferPreparer"
-    path = "benchmark-client/build/libs/benchmark-client-all.jar"
+    path = "client-test/build/libs/client-test-all.jar"
   [modules.processor]
     name = "client.transfer.TransferProcessor"
-    path = "benchmark-client/build/libs/benchmark-client-all.jar"
+    path = "client-test/build/libs/client-test-all.jar"
   [modules.postprocessor]
     name = "client.transfer.TransferReporter"
-    path = "benchmark-client/build/libs/benchmark-client-all.jar"
+    path = "client-test/build/libs/client-test-all.jar"
   [[modules.injectors]]
     name = "verification.db.transfer.CassandraKiller"
     path = "verification-db/build/libs/verification-db-all.jar"
