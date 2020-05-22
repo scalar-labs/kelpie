@@ -42,7 +42,7 @@ public class TransferChecker extends PostProcessor {
     }
   }
 
-  public List<JsonObject> readBalancesWithRetry() {
+  private List<JsonObject> readBalancesWithRetry() {
     logInfo("reading latest assets...");
 
     Retry retry = Common.getRetryWithExponentialBackoff("readBalances");
