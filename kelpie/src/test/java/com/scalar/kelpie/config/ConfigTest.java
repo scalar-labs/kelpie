@@ -22,9 +22,11 @@ public class ConfigTest {
   static final String WRONG_CONFIG_TABLE = "no_config";
   static final String LONG_PARAMETER = "my_long_parameter";
   static final String STRING_PARAMETER = "my_str_parameter";
+  static final String BOOLEAN_PARAMETER = "my_bool_parameter";
   static final String WRONG_PARAMETER = "no_parameter";
   static final long ANY_LONG = 100L;
   static final String ANY_STRING = "test";
+  static final boolean ANY_BOOLEAN = true;
   static final long ANY_SIGNIFICANT_DIGITS = 4L;
 
   static final long DEFAULT_RUN_FOR_SEC = 60L;
@@ -70,6 +72,10 @@ public class ConfigTest {
           + " = \""
           + ANY_STRING
           + "\"\n"
+          + BOOLEAN_PARAMETER
+          + " = "
+          + ANY_BOOLEAN
+          + "\n"
           + "[stats]\n"
           + "  significant_digits = "
           + ANY_SIGNIFICANT_DIGITS
@@ -217,6 +223,30 @@ public class ConfigTest {
 
     // Assert
     assertThat(parameter).isEqualTo(ANY_STRING);
+  }
+
+  @Test
+  public void getUserBoolean_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean parameter = config.getUserBoolean(MY_CONFIG_TABLE, BOOLEAN_PARAMETER);
+
+    // Assert
+    assertThat(parameter).isEqualTo(ANY_BOOLEAN);
+  }
+
+  @Test
+  public void getUserBoolean_DefaultValueGiven_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean parameter = config.getUserBoolean(WRONG_CONFIG_TABLE, BOOLEAN_PARAMETER, ANY_BOOLEAN);
+
+    // Assert
+    assertThat(parameter).isEqualTo(ANY_BOOLEAN);
   }
 
   @Test

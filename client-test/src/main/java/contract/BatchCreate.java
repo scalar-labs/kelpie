@@ -1,4 +1,4 @@
-package benchmark.contract;
+package contract;
 
 import com.scalar.dl.ledger.contract.Contract;
 import com.scalar.dl.ledger.database.Ledger;

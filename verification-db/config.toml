@@ -26,4 +26,5 @@
   ssh_user = "centos"
   ssh_port = 22
   ssh_private_key = "/home/centos/.ssh/private_key"
+  contact_points = "localhost"
   max_kill_interval_sec = 300

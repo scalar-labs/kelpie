@@ -1,4 +1,4 @@
-package benchmark.contract;
+package contract;
 
 import com.scalar.dl.ledger.asset.Asset;
 import com.scalar.dl.ledger.contract.Contract;
@@ -17,7 +17,7 @@ public class Transfer extends Contract {
     int amount = argument.getInt("amount");
     String fromId = array.getString(0);
     String toId = array.getString(1);
-    if (fromId == toId) {
+    if (fromId.equals(toId)) {
       throw new ContractContextException("transfer between the same ID isn't supported");
     }
 

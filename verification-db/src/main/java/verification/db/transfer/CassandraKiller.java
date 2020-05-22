@@ -37,7 +37,7 @@ public class CassandraKiller extends Injector {
     String privateKeyFile = config.getUserString("killer_config", "ssh_private_key");
     nodes =
         config
-            .getUserString("test_config", "contact_points", Common.DEFAULT_CONTACT_POINT)
+            .getUserString("killer_config", "contact_points", Common.DEFAULT_CONTACT_POINT)
             .split(",");
     accessors = getAccessors(user, port, privateKeyFile, nodes);
   }

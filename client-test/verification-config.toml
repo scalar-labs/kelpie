@@ -1,0 +1,47 @@
+[modules]
+  [modules.preprocessor]
+    name = "client.transfer.TransferPreparer"
+    path = "client-test/build/libs/client-test-all.jar"
+  [modules.processor]
+    name = "client.transfer.TransferProcessor"
+    path = "client-test/build/libs/client-test-all.jar"
+  [modules.postprocessor]
+    name = "client.transfer.TransferChecker"
+    path = "client-test/build/libs/client-test-all.jar"
+  [[modules.injectors]]
+    name = "verification.db.transfer.CassandraKiller"
+    path = "verification-db/build/libs/verification-db-all.jar"
+
+[common]
+  concurrency = 5
+  run_for_sec = 900
+  ramp_for_sec = 0
+
+[stats]
+  realtime_report_enabled = false
+
+[test_config]
+  is_verification = true
+  num_accounts = 10
+  population_concurrency = 32
+  contact_points = "localhost"
+
+[contract]
+  population_contract_name = "contract.BatchCreate"
+  population_contract_path = "client-test/build/classes/java/main/contract/BatchCreate.class"
+  transfer_contract_name = "contract.Transfer"
+  transfer_contract_path = "client-test/build/classes/java/main/contract/Transfer.class"
+  balance_contract_name = "contract.Balance"
+  balance_contract_path = "client-test/build/classes/java/main/contract/Balance.class"
+
+[client_config]
+  dl_server = "localhost"
+  certificate = "client-test/sample-keys/certificate.pem"
+  private_key = "client-test/sample-keys/private-key.pem"
+
+[killer_config]
+  ssh_user = "centos"
+  ssh_port = 22
+  ssh_private_key = "/home/centos/.ssh/id_rsa"
+  max_kill_interval_sec = 300
+  contact_points = "localhost"

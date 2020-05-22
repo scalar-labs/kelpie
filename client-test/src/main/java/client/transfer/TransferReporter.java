@@ -1,4 +1,4 @@
-package benchmark.client.transfer;
+package client.transfer;
 
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.modules.PostProcessor;
