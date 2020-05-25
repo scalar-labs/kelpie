@@ -24,9 +24,3 @@ jobs:
 
     - name: Build Kelpie
       run: ./gradlew build
-
-    - name: Test a sample
-      run: |
-        ./gradlew shadowJar
-        ./gradlew installDist
-        ./kelpie/build/install/kelpie/bin/kelpie --config print-modules/config.toml --inject
