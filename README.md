@@ -64,7 +64,7 @@ Let's take a closer look at each module to properly write your own modules.
 
 The following is `PrintPre` class from the example print modules, which does nothing except for printing some texts to stdout. As you can see, you can write arbitrary code in the `execute` method. Also, you can pass some static variables to the method through `Config` that is instantiated based on a configuration file (`print-modules/config.toml` for the print-modules case).
 
-`setState()` is used for giving the title as a `JsonObject` to `PrintProcessor` which is executed next. The giving state operation to the next module is explained later.
+`setState()` is used for pass the title as a `JsonObject` to `PrintProcessor` which is executed next. The state passing operation to the next module is explained later.
 
 ```java
 package print;
@@ -101,7 +101,7 @@ Like `Preprocessor`, you need to implement the constructor, `execute()` and `clo
 
 The following class is an example of `Processor`, which prints out a message for the specified number of times by `num`. 
 
-`setState()` is used for giving the counter as a `JsonObject` to `PrintPost` which is executed next. The giving state operation to the next module is explained later.
+`setState()` is used to pass the counter as a `JsonObject` to `PrintPost` which is executed next. The state passing operation to the next module is explained later.
 
 ```java
 package print;
@@ -148,12 +148,13 @@ public class PrintProcessor extends Processor {
 ```
 
 ### Other Processors
-`TimeBasedProcessor` or `FrequencyBasedProcessor` can be used instead of `Processor`. You need to implement only `executeEach()` and `close()`. These processors execute `executeEach()` repeatedly for the specified time or count. The other words, you don't have to make a loop to execute opeations again and again in `execute()`.
+`Processor` usually keeps executing some operation for a specified time period or for a specified number of times. Kelpie provides other processors `TimeBasedProcessor` and `FrequencyBasedProcessor` to support such common cases.
+With those, you only need to implement an operation of processing with `executeEach()` and the framework takes care of iterations so that you don't need to make a loop to execute operations by yourself.
 
-The following sample processor is almost the same as the above `PrintProcessor`. How many times `executeEach()` is invoked (`num` in `PrintProcessor`) is specified by `num_operations` in `[common]` in the config file.
+The following class is an example of `FrequencyBasedProcessor`. It executes the same operations as the above `PrintProcessor` but what you need to write is a lot less.  `executeEach()` is invoked (`num` in `PrintProcessor`) for the specified number of times with `num_operations` in `[common]` in the config file.
 
 ```java
-public class PrintProcessor2 extends FrequencyBasedProcessor {
+public class FrequencyBasedPrintProcessor extends FrequencyBasedProcessor {
   private final AtomicInteger total = new AtomicInteger(0);
 
   public PrintProcessor2(Config config) {
@@ -273,8 +274,74 @@ When multiple `Injector`s are specified, the way they run concurrently is contro
 In the future, you may be able to specify `InjectionExecutor` in the configuration.
 
 # State
-Sometimes, you might want to give the current state from the current module to the next module, from `PreProcessor` to `Processor` or from `Processor` to `PostProcessor`.
+There are many cases where you want to pass the state of a current module to the next module such as from `PreProcessor` to `Processor` and from `Processor` to `PostProcessor`.
+You can do such state passing between modules by using `setState()` and `getPreviousState()` methods in modules.
 You make `JsonObject` and set it with `setState()`. The next module can read the `JsonObject` with `getPreviousState()`.
+
+# Stats
+Kelpie has statistics `Stats` to get the performance or the number of succeeded or failed operations.
+
+## Record each result
+When you use `TimeBasedProcessor` or `FrequencyBasedProcessor`, `executeEach()` adds each latency automatically if it doesn't throw an exception. In other words, you can avoid recording a latency which you don't want to record by throwing an exception in `executeEach()`.
+
+When you use `Processor`, you need to explicitly record each latency or failure in `execute()` by using `recordLatency()` or `recordFailure()`.
+
+```java
+public class RecordProcessor extends Processor {
+
+  public RecordProcessor(Config config) {
+    super(config);
+  }
+
+  @Override
+  public void execute() {
+    for(int i = 0; i < 1000; i++) {
+      long start = System.currentTimeMillis();
+      boolean isSuccess = doOperation();
+      long latency = System.currentTimeMillis() - start;
+
+      if (isSuccess) {
+        getStats().recordLatency(latency);
+      } else {
+        getStats().recordFailure();
+      }
+    }
+  }
+
+  @Override
+  public void close() {}
+
+  private boolean doOperation() {
+    ...
+  }
+}
+```
+
+## Get statistics result
+The easiest way to get the statistics result is to invoke `getSummary()` in `PostProcessor`.
+The summary has the average throughput (the number of succeeded operations per second), the total number of succeeded operations, the total number of failure operations, the average latency, the maximum latency, and so on.
+
+```java
+public class SummaryReporter extends PostProcessor {
+
+  public SummaryReporter(Config config) {
+    super(config);
+  }
+
+  @Override
+  public void execute() {
+    getSummary();
+  }
+
+  @Override
+  public void close() {}
+}
+```
+
+To get each statistics information in your test, you get `Stats` instance from a module of `Processor` or `PostProcessor`. For example, `getStats().getMeanLatency()` returns the average latency.
+
+## Realtime reporting
+When you set `realtime_report_enabled` of `[stats]` true in your config file, Kelpie outputs the throughput and the total number of operations at that time while your test is running.
 
 # Config
 A config is a TOML-formatted file where you can define what modules and static variables to use in your test.
