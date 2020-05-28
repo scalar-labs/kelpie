@@ -1,8 +1,11 @@
 [![Build Status](https://github.com/scalar-labs/kelpie/workflows/Kelpie/badge.svg)](https://github.com/scalar-labs/kelpie/actions)
 
 # Kelpie
-
+## What is Kelpie?
 Kelpie is a simple yet general framework for running end-to-end testing such as system verification and benchmarking.
+
+Kelpie handles *task*s with modules. In this document, a *task* is a series of processing, and *operation* is the target unit that you want to test.
+For example, if you try to benchmark updating records in a database, a task is required to insert initial records before benchmarking. An update request to the database is an operation. It's not always a single request. Sometimes, an operation is a series of requests like a transaction that is composed of read requests and update requests.
 
 ## How Kelpie works
 Kelpie is composed of a framework that orchestrates a test and takes care of task management such as concurrent execution, and a test that is run by the framework.
@@ -148,7 +151,7 @@ public class PrintProcessor extends Processor {
 ```
 
 ### Other Processors
-`Processor` usually keeps executing some operation for a specified time period or for a specified number of times. Kelpie provides other processors `TimeBasedProcessor` and `FrequencyBasedProcessor` to support such common cases.
+`Processor` usually keeps executing some operations for a specified time period or for a specified number of times. Kelpie provides other processors `TimeBasedProcessor` and `FrequencyBasedProcessor` to support such common cases.
 With those, you only need to implement an operation of processing with `executeEach()` and the framework takes care of iterations so that you don't need to make a loop to execute operations by yourself.
 
 The following class is an example of `FrequencyBasedProcessor`. It executes the same operations as the above `PrintProcessor` but what you need to write is a lot less.  `executeEach()` is invoked (`num` in `PrintProcessor`) for the specified number of times with `num_operations` in `[common]` in the config file.
