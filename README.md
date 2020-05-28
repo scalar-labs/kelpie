@@ -4,11 +4,11 @@
 ## What is Kelpie?
 Kelpie is a simple yet general framework for running end-to-end testing such as system verification and benchmarking.
 
-Kelpie handles *task*s with modules. In this document, a *task* is a series of processing, and *operation* is the target unit that you want to test.
-For example, if you try to benchmark updating records in a database, a task is required to insert initial records before benchmarking. An update request to the database is an operation. It's not always a single request. Sometimes, an operation is a series of requests like a transaction that is composed of read requests and update requests.
+Kelpie executes a *job*. This job is a set of *processes*. This process is a set of operations. Kelpie loads multiple *modules* called `PreProcessor`, `Processor`, `PostProcessor`, and `Injector`, then makes them execute each process.
+For example, if you try to benchmark updating records in a database, the pre-process is required to insert initial records before benchmarking. The main process of the benchmark is issuing a lot of update operations concurrently. It's not always a single request. Sometimes, an operation is a series of requests like a transaction that is composed of read requests and update requests. Finally, the post-process is to output the throughput or the number of requests.
 
 ## How Kelpie works
-Kelpie is composed of a framework that orchestrates a test and takes care of task management such as concurrent execution, and a test that is run by the framework.
+Kelpie is composed of a framework that orchestrates a test and takes care of process management such as concurrent execution, and a test that is run by the framework.
 As the following diagram shows, a test in Kelpie has 3 steps; pre-process, process and post-process, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
 
 <p align="center">
@@ -62,7 +62,7 @@ As the following diagram shows, a test in Kelpie has 3 steps; pre-process, proce
 Let's take a closer look at each module to properly write your own modules.
 
 ## PreProcessor
-`PreProcessor` runs some tasks before `Processor`. It is usually used for some preparation of the subsequent processing. For example, it can populate initial records for a database performance benchmarking.
+`PreProcessor` executes the first process of a job before `Processor`. It is usually used for some preparation for the subsequent processing. For example, it can populate initial records for a database performance benchmarking.
 `PreProcessor` has one method called `execute()` where you can define its behavior. `execute()` can be non-thread-safe since it is executed by a single thread.
 
 The following is `PrintPre` class from the example print modules, which does nothing except for printing some texts to stdout. As you can see, you can write arbitrary code in the `execute` method. Also, you can pass some static variables to the method through `Config` that is instantiated based on a configuration file (`print-modules/config.toml` for the print-modules case).
@@ -98,7 +98,7 @@ public class PrintPre extends PreProcessor {
 ```
 
 ## Processor
-`Processor` executes actual tests. For example, if it is benchmarking a database server, `Processor` makes a query, send it to the server, get the response back from the server, and continue them until it finishes.
+`Processor` executes a main process. For example, if it is benchmarking a database server, `Processor` makes a query, send it to the server, get the response back from the server, and continue them until it finishes.
 
 Like `Preprocessor`, you need to implement the constructor, `execute()` and `close()`. `execute()` can be executed concurrently with multiple threads if `concurrency` is set to more than 1 in the configuration file. Note that you need to make `execute()` thread-safe in that case.
 
@@ -160,7 +160,7 @@ The following class is an example of `FrequencyBasedProcessor`. It executes the 
 public class FrequencyBasedPrintProcessor extends FrequencyBasedProcessor {
   private final AtomicInteger total = new AtomicInteger(0);
 
-  public PrintProcessor2(Config config) {
+  public FrequencyBasedPrintProcessor(Config config) {
     super(config);
   }
 
@@ -180,7 +180,7 @@ public class FrequencyBasedPrintProcessor extends FrequencyBasedProcessor {
 ```
 
 ## PostProcessor
-`PostProcessor` executes some tasks after all `Processor#execute()` finish. For example, if it is verifying database consistency, `PostProcessor` reads all the records of the database and checks if their values are as expected. `PostProcessor#execute()` is always executed with a single thread.
+`PostProcessor` executes the last process in a job after all `Processor#execute()` finish. For example, if it is verifying database consistency, `PostProcessor` reads all the records of the database and checks if their values are as expected. `PostProcessor#execute()` is always executed with a single thread.
 
 Like `PreProcessor` and `Processor`, you need to implement the constructor, `execute()` and `close()`. The following class is an example of `PostProcessor`, which prints out the specified configurations and checks if a given value is an expected value.
 
@@ -221,7 +221,7 @@ public class PrintPost extends PostProcessor {
 When `PostProcessor` check the result of `Processor` execution and the result isn't expected, `PostProcessor#execute()` should throw an exception `PostProcessException`. A test will fail when the exception is thrown.
 
 ## Injector
-`Injector` executes some arbitrary tasks that you want to execute while `Processor#execute()` is running. For example, if it is verifying database consistency in a catastrophic environment, `Injector` kills and restarts a database process randomly and frequently.
+`Injector` executes an arbitrary process that you want to execute while `Processor#execute()` is running. For example, if it is verifying database consistency in a catastrophic environment, `Injector` kills and restarts a database process randomly and frequently.
 
 You can enable `Injector` by adding `--inject` option to the `kelpie` command.
 
