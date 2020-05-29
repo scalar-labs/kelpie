@@ -150,7 +150,7 @@ public class Config {
   }
 
   /**
-   * Returns a time for running a process in seconds.
+   * Returns a time for running the main operations in seconds.
    *
    * @return a runtime in seconds
    */
@@ -159,7 +159,7 @@ public class Config {
   }
 
   /**
-   * Returns a ramp time before running the main process in seconds.
+   * Returns a ramp time before running the main operations in seconds.
    *
    * @return a ramp time in seconds
    */
@@ -168,7 +168,7 @@ public class Config {
   }
 
   /**
-   * Returns the number of operations for running the main process.
+   * Returns the number of operations for running the main operations.
    *
    * @return number of operations
    */
@@ -177,7 +177,7 @@ public class Config {
   }
 
   /**
-   * Returns the number of operations before running the main process.
+   * Returns the number of operations before running the main operations.
    *
    * @return number of operations
    */
