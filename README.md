@@ -1,15 +1,16 @@
 [![Build Status](https://github.com/scalar-labs/kelpie/workflows/Kelpie/badge.svg)](https://github.com/scalar-labs/kelpie/actions)
 
 # Kelpie
-## What is Kelpie?
+## What is Kelpie ?
 Kelpie is a simple yet general framework for running end-to-end testing such as system verification and benchmarking.
 
-Kelpie executes a *job*. This job is a set of *processes*. This process is a set of operations. Kelpie loads multiple *modules* called `PreProcessor`, `Processor`, `PostProcessor`, and `Injector`, then makes them execute each process.
-For example, if you try to benchmark updating records in a database, the pre-process is required to insert initial records before benchmarking. The main process of the benchmark is issuing a lot of update operations concurrently. It's not always a single request. Sometimes, an operation is a series of requests like a transaction that is composed of read requests and update requests. Finally, the post-process is to output the throughput or the number of requests.
+Kelpie executes a work called *job*. A job is composed of a set of *processes*, and a process is composed of a set of operations, and an operation is a minimum unit of work in Kelpie. At the current version, a job is composed of pre-defined processes such as pre-process, process and post-process. The job model is usually expressive enough to abstract various kind of testing such as benchmarking and verification.
+
+Let's think about how a benchmark for a database can be abstracted with the Kelpie job model as an example. A benchmark usually has 3 steps; a data loading step where required initial data set is loaded, an actual benchmarking step where the performance is measured, and a reporting step where the benchmark results are summarized and reported. With Kelpie, a benchmark can be modeled as a job and each step can be modeled as pre-process, process and post-process respectively.
 
 ## How Kelpie works
-Kelpie is composed of a framework that orchestrates a test and takes care of process management such as concurrent execution, and a test that is run by the framework.
-As the following diagram shows, a test in Kelpie has 3 steps; pre-process, process and post-process, which run in a sequential order. A test can also have an injection step that runs in parallel with the processing step. The behavior of each step can be described by implementing the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
+Kelpie is composed of a framework that orchestrates a job and takes care of execution of processes, and a job that is executed by the framework.
+As the following diagram shows, Kelpie executes a job by executing pre-process, process and post-process in a sequential order. A job can also have an injection process that is executed in parallel with the execution of process. Each process can be implemented with the corresponding modules called `PreProcessor`, `Processor`, `PostProcessor` and `Injector` respectively.
 
 <p align="center">
   <img src="doc/kelpie.png" width=450px>
@@ -151,10 +152,10 @@ public class PrintProcessor extends Processor {
 ```
 
 ### Other Processors
-`Processor` usually keeps executing some operations for a specified time period or for a specified number of times. Kelpie provides other processors `TimeBasedProcessor` and `FrequencyBasedProcessor` to support such common cases.
-With those, you only need to implement an operation of processing with `executeEach()` and the framework takes care of iterations so that you don't need to make a loop to execute operations by yourself.
+`Processor` usually executes the same operation repeatedly for a specified time period or for a specified number of times. Kelpie provides other processors `TimeBasedProcessor` and `FrequencyBasedProcessor` to support such common cases.
+With those, you only need to implement an operation of a process with `executeEach()` and the framework takes care of iterations so that you don't need to make a loop to execute operations by yourself.
 
-The following class is an example of `FrequencyBasedProcessor`. It executes the same operations as the above `PrintProcessor` but what you need to write is a lot less.  `executeEach()` is invoked (`num` in `PrintProcessor`) for the specified number of times with `num_operations` in `[common]` in the config file.
+The following class is an example of `FrequencyBasedProcessor`. It executes the same operation as the above `PrintProcessor` but what you need to write is a lot less.  `executeEach()` is invoked (`num` in `PrintProcessor`) for the specified number of times with `num_operations` in `[common]` in the config file.
 
 ```java
 public class FrequencyBasedPrintProcessor extends FrequencyBasedProcessor {
