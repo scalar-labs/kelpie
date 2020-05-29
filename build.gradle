@@ -1,1 +1,34 @@
+plugins {
+    id 'java'
+    id 'application'
+}
 
+mainClassName = 'com.scalar.kelpie.Kelpie'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    implementation group: 'com.google.guava', name: 'guava', version: '24.1-jre'
+    implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
+    implementation group: 'info.picocli', name: 'picocli', version: '4.1.4'
+    implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
+    implementation group: 'org.glassfish', name: 'javax.json', version: '1.1.4'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+    implementation group: 'org.hdrhistogram', name: 'HdrHistogram', version: '2.1.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.13'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.14.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = "com.scalar-labs"
+archivesBaseName = "kelpie"
+//version = "1.0.0"
+
+// for archiving and uploading to maven central
+//apply from: 'archive.gradle'
