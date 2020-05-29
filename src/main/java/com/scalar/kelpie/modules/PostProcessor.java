@@ -3,7 +3,7 @@ package com.scalar.kelpie.modules;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.stats.Stats;
 
-/** PostProcessor executes some tasks after {@link Processor#execute()} finishes. */
+/** PostProcessor executes a process after {@link Processor#execute()} finishes. */
 public abstract class PostProcessor extends Module {
   private Stats stats;
 

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.concurrent.Immutable;
 
-/** Configuration for Kelpie and your test. */
+/** Configuration for Kelpie and a job. */
 @Immutable
 public class Config {
   private final String DEFAULT_INJECTION_EXECUTOR =
@@ -150,7 +150,7 @@ public class Config {
   }
 
   /**
-   * Returns a time for running a test in seconds.
+   * Returns a time for running a process in seconds.
    *
    * @return a runtime in seconds
    */
@@ -159,7 +159,7 @@ public class Config {
   }
 
   /**
-   * Returns a ramp time before running a test in seconds.
+   * Returns a ramp time before running the main process in seconds.
    *
    * @return a ramp time in seconds
    */
@@ -168,7 +168,7 @@ public class Config {
   }
 
   /**
-   * Returns the number of operations for running a test.
+   * Returns the number of operations for running the main process.
    *
    * @return number of operations
    */
@@ -177,7 +177,7 @@ public class Config {
   }
 
   /**
-   * Returns the number of operations before running a test.
+   * Returns the number of operations before running the main process.
    *
    * @return number of operations
    */

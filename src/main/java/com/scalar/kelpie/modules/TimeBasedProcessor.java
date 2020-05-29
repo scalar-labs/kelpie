@@ -4,7 +4,7 @@ import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.stats.Stats;
 import java.util.function.Supplier;
 
-/** TimeBasedProcessor executes actual tests for the configured time. */
+/** TimeBasedProcessor executes operations for the configured time. */
 public abstract class TimeBasedProcessor extends Processor {
   public TimeBasedProcessor(Config config) {
     super(config);

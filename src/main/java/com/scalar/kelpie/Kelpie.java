@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-    description = "Execute a test built with Kelpie framework.",
+    description = "Execute a job built with Kelpie framework.",
     name = "kelpie",
     mixinStandardHelpOptions = true,
     version = "kelpie v0.1.0")
@@ -22,7 +22,7 @@ public class Kelpie implements Callable {
       names = {"--config"},
       required = true,
       paramLabel = "<CONFIG_FILE>",
-      description = "A config file of a test")
+      description = "A config file of a job")
   private String configPath;
 
   @CommandLine.Option(
@@ -56,17 +56,17 @@ public class Kelpie implements Callable {
 
   @Override
   public Void call() {
-    LOGGER.info("Checking a test config...");
+    LOGGER.info("Checking a job config...");
     Config config = setupConfig();
 
     LOGGER.info("Loading modules...");
     Injector injector = Guice.createInjector(new KelpieModule(config));
     KelpieExecutor executor = injector.getInstance(KelpieExecutor.class);
 
-    LOGGER.info("Starting the test...");
+    LOGGER.info("Starting the job...");
     executor.execute();
 
-    LOGGER.info("The test has been completed successfully");
+    LOGGER.info("The job has been completed successfully");
 
     return null;
   }

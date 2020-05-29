@@ -3,7 +3,7 @@ package com.scalar.kelpie.modules;
 import com.scalar.kelpie.config.Config;
 import com.scalar.kelpie.stats.Stats;
 
-/** Processor executes actual tests. */
+/** Processor executes operations. */
 public abstract class Processor extends Module {
   private Stats stats;
 

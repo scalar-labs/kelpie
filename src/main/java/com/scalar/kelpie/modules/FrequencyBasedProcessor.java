@@ -5,7 +5,7 @@ import com.scalar.kelpie.stats.Stats;
 import java.util.function.Supplier;
 import java.util.stream.LongStream;
 
-/** FrequencyBasedProcessor executes actual tests by the configured count. */
+/** FrequencyBasedProcessor executes operations by the configured count. */
 public abstract class FrequencyBasedProcessor extends Processor {
   public FrequencyBasedProcessor(Config config) {
     super(config);
