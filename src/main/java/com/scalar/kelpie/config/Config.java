@@ -268,11 +268,29 @@ public class Config {
     injectorEnabled = true;
   }
 
+  /**
+   * Sets selected modules enable.
+   *
+   * @param enablePreProcessor if true, sets {@link com.scalar.kelpie.modules.PreProcessor} enable
+   * @param enableProcessor if true, sets {@link com.scalar.kelpie.modules.Processor} enable
+   * @param enablePostProcessor if true, sets {@link com.scalar.kelpie.modules.PostProcessor} enable
+   */
+  public void enableSelectedProcessors(
+      boolean enablePreProcessor, boolean enableProcessor, boolean enablePostProcessor) {
+    if (enablePreProcessor) {
+      enablePreProcessor();
+    }
+    if (enableProcessor) {
+      enableProcessor();
+    }
+    if (enablePostProcessor) {
+      enablePostProcessor();
+    }
+  }
+
   /** Sets all modules enable. */
   public void enableAllProcessors() {
-    enablePreProcessor();
-    enableProcessor();
-    enablePostProcessor();
+    enableSelectedProcessors(true, true, true);
   }
 
   /**

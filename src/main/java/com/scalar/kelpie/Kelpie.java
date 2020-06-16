@@ -44,6 +44,24 @@ public class Kelpie implements Callable {
   private boolean onlyPost = false;
 
   @CommandLine.Option(
+      names = {"--exclude-pre"},
+      required = false,
+      description = "Execute without the pre-process")
+  private boolean excludePre = false;
+
+  @CommandLine.Option(
+      names = {"--exclude-process"},
+      required = false,
+      description = "Execute without the process")
+  private boolean excludeProcess = false;
+
+  @CommandLine.Option(
+      names = {"--exclude-post"},
+      required = false,
+      description = "Execute without the post-process")
+  private boolean excludePost = false;
+
+  @CommandLine.Option(
       names = {"--inject"},
       required = false,
       description = "Execute the injectors")
@@ -76,13 +94,23 @@ public class Kelpie implements Callable {
       throw new IllegalArgumentException("You can use only one of --only-* options at once");
     }
 
+    if ((onlyPost || onlyProcess || onlyPost) && (excludePre || excludeProcess || excludePost)) {
+      throw new IllegalArgumentException("You can use either --only-* or --exclude-* option");
+    }
+
     Config config = new Config(new File(configPath));
     if (onlyPre) {
-      config.enablePreProcessor();
+      config.enableSelectedProcessors(true, false, false);
     } else if (onlyProcess) {
-      config.enableProcessor();
+      config.enableSelectedProcessors(false, true, false);
     } else if (onlyPost) {
-      config.enablePostProcessor();
+      config.enableSelectedProcessors(false, false, true);
+    } else if (excludePre) {
+      config.enableSelectedProcessors(false, true, true);
+    } else if (excludeProcess) {
+      config.enableSelectedProcessors(true, false, true);
+    } else if (excludePost) {
+      config.enableSelectedProcessors(true, true, false);
     } else {
       config.enableAllProcessors();
     }
