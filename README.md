@@ -57,7 +57,7 @@ As the following diagram shows, Kelpie executes a job by executing pre-process, 
     ```
     ${kelpie}/bin/kelpie --config your_config.toml
     ```
-    - There are other options such as `--only-pre`, `--only-process` and `--only-post`, which run only the specified process. `--exclude-pre`, `--exclude-process` and `--exclude-post` run a job without the specified process.
+    - There are other options such as `--only-pre`, `--only-process` and `--only-post`, which run only the specified process. `--except-pre`, `--except-process` and `--except-post` run a job without the specified process.
 
 # How to create your own modules
 Let's take a closer look at each module to properly write your own modules.

@@ -44,22 +44,22 @@ public class Kelpie implements Callable {
   private boolean onlyPost = false;
 
   @CommandLine.Option(
-      names = {"--exclude-pre"},
+      names = {"--except-pre"},
       required = false,
-      description = "Execute without the pre-process")
-  private boolean excludePre = false;
+      description = "Execute except pre-process")
+  private boolean exceptPre = false;
 
   @CommandLine.Option(
-      names = {"--exclude-process"},
+      names = {"--except-process"},
       required = false,
-      description = "Execute without the process")
-  private boolean excludeProcess = false;
+      description = "Execute except process")
+  private boolean exceptProcess = false;
 
   @CommandLine.Option(
-      names = {"--exclude-post"},
+      names = {"--except-post"},
       required = false,
-      description = "Execute without the post-process")
-  private boolean excludePost = false;
+      description = "Execute except post-process")
+  private boolean exceptPost = false;
 
   @CommandLine.Option(
       names = {"--inject"},
@@ -94,23 +94,35 @@ public class Kelpie implements Callable {
       throw new IllegalArgumentException("You can use only one of --only-* options at once");
     }
 
-    if ((onlyPost || onlyProcess || onlyPost) && (excludePre || excludeProcess || excludePost)) {
-      throw new IllegalArgumentException("You can use either --only-* or --exclude-* option");
+    if ((onlyPost || onlyProcess || onlyPost) && (exceptPre || exceptProcess || exceptPost)) {
+      throw new IllegalArgumentException("You can use either --only-* or --except-* option");
     }
 
     Config config = new Config(new File(configPath));
     if (onlyPre) {
-      config.enableSelectedProcessors(true, false, false);
+      config.enablePreProcessor(true);
+      config.enableProcessor(false);
+      config.enablePostProcessor(false);
     } else if (onlyProcess) {
-      config.enableSelectedProcessors(false, true, false);
+      config.enablePreProcessor(false);
+      config.enableProcessor(true);
+      config.enablePostProcessor(false);
     } else if (onlyPost) {
-      config.enableSelectedProcessors(false, false, true);
-    } else if (excludePre) {
-      config.enableSelectedProcessors(false, true, true);
-    } else if (excludeProcess) {
-      config.enableSelectedProcessors(true, false, true);
-    } else if (excludePost) {
-      config.enableSelectedProcessors(true, true, false);
+      config.enablePreProcessor(false);
+      config.enableProcessor(false);
+      config.enablePostProcessor(true);
+    } else if (exceptPre) {
+      config.enablePreProcessor(false);
+      config.enableProcessor(true);
+      config.enablePostProcessor(true);
+    } else if (exceptProcess) {
+      config.enablePreProcessor(true);
+      config.enableProcessor(false);
+      config.enablePostProcessor(true);
+    } else if (exceptPost) {
+      config.enablePreProcessor(true);
+      config.enableProcessor(true);
+      config.enablePostProcessor(false);
     } else {
       config.enableAllProcessors();
     }
