@@ -44,6 +44,24 @@ public class Kelpie implements Callable {
   private boolean onlyPost = false;
 
   @CommandLine.Option(
+      names = {"--except-pre"},
+      required = false,
+      description = "Execute except pre-process")
+  private boolean exceptPre = false;
+
+  @CommandLine.Option(
+      names = {"--except-process"},
+      required = false,
+      description = "Execute except process")
+  private boolean exceptProcess = false;
+
+  @CommandLine.Option(
+      names = {"--except-post"},
+      required = false,
+      description = "Execute except post-process")
+  private boolean exceptPost = false;
+
+  @CommandLine.Option(
       names = {"--inject"},
       required = false,
       description = "Execute the injectors")
@@ -76,13 +94,35 @@ public class Kelpie implements Callable {
       throw new IllegalArgumentException("You can use only one of --only-* options at once");
     }
 
+    if ((onlyPost || onlyProcess || onlyPost) && (exceptPre || exceptProcess || exceptPost)) {
+      throw new IllegalArgumentException("You can use either --only-* or --except-* option");
+    }
+
     Config config = new Config(new File(configPath));
     if (onlyPre) {
-      config.enablePreProcessor();
+      config.enablePreProcessor(true);
+      config.enableProcessor(false);
+      config.enablePostProcessor(false);
     } else if (onlyProcess) {
-      config.enableProcessor();
+      config.enablePreProcessor(false);
+      config.enableProcessor(true);
+      config.enablePostProcessor(false);
     } else if (onlyPost) {
-      config.enablePostProcessor();
+      config.enablePreProcessor(false);
+      config.enableProcessor(false);
+      config.enablePostProcessor(true);
+    } else if (exceptPre) {
+      config.enablePreProcessor(false);
+      config.enableProcessor(true);
+      config.enablePostProcessor(true);
+    } else if (exceptProcess) {
+      config.enablePreProcessor(true);
+      config.enableProcessor(false);
+      config.enablePostProcessor(true);
+    } else if (exceptPost) {
+      config.enablePreProcessor(true);
+      config.enableProcessor(true);
+      config.enablePostProcessor(false);
     } else {
       config.enableAllProcessors();
     }

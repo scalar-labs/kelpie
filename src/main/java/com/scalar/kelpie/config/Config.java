@@ -248,19 +248,31 @@ public class Config {
     return realtimeReportEnabled;
   }
 
-  /** Sets {@link com.scalar.kelpie.modules.PreProcessor} enable. */
-  public void enablePreProcessor() {
-    preProcessorEnabled = true;
+  /**
+   * Sets {@link com.scalar.kelpie.modules.PreProcessor} enable.
+   *
+   * @param isEnabled if true, PreProcessor is enabled
+   */
+  public void enablePreProcessor(boolean isEnabled) {
+    preProcessorEnabled = isEnabled;
   }
 
-  /** Sets {@link com.scalar.kelpie.modules.Processor} enable. */
-  public void enableProcessor() {
-    processorEnabled = true;
+  /**
+   * Sets {@link com.scalar.kelpie.modules.Processor} enable.
+   *
+   * @param isEnabled if true, Processor is enabled
+   */
+  public void enableProcessor(boolean isEnabled) {
+    processorEnabled = isEnabled;
   }
 
-  /** Sets {@link com.scalar.kelpie.modules.PostProcessor} enable. */
-  public void enablePostProcessor() {
-    postProcessorEnabled = true;
+  /**
+   * Sets {@link com.scalar.kelpie.modules.PostProcessor} enable.
+   *
+   * @param isEnabled if true, PostProcessor is enabled
+   */
+  public void enablePostProcessor(boolean isEnabled) {
+    postProcessorEnabled = isEnabled;
   }
 
   /** Sets {@link com.scalar.kelpie.modules.Injector}s enable. */
@@ -270,9 +282,9 @@ public class Config {
 
   /** Sets all modules enable. */
   public void enableAllProcessors() {
-    enablePreProcessor();
-    enableProcessor();
-    enablePostProcessor();
+    enablePreProcessor(true);
+    enableProcessor(true);
+    enablePostProcessor(true);
   }
 
   /**
