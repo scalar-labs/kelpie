@@ -13,3 +13,5 @@ RUN git clone https://github.com/scalar-labs/kelpie-test.git kelpie-test && \
     gradle shadowJar
 
 WORKDIR /home/gradle/kelpie-test/
+
+ENTRYPOINT [ "/usr/local/bin/kelpie" ]
