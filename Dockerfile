@@ -1,10 +1,11 @@
 FROM gradle:jdk8
 
-RUN git clone https://github.com/scalar-labs/kelpie.git kelpie && \
-    cd kelpie && ./gradlew installDist && \ 
-    cd .. && \
-    mv /home/gradle/kelpie/build/install/kelpie/bin/* /usr/local/bin/ && \
-    mv /home/gradle/kelpie/build/install/kelpie/lib/* /usr/local/lib/ && \
+COPY ./kelpie.tar .
+
+RUN tar xf kelpie.tar && rm -f kelpie.tar
+
+RUN mv kelpie/bin/* /usr/local/bin/ && \
+    mv kelpie/lib/* /usr/local/lib/ && \
     rm -rf kelpie
 
 RUN git clone https://github.com/scalar-labs/kelpie-test.git kelpie-test && \

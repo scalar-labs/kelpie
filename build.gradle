@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.palantir.docker' version '0.25.0'
 }
 
 mainClassName = 'com.scalar.kelpie.Kelpie'
@@ -31,6 +32,11 @@ task sourcesJar(type: Jar) {
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
+}
+
+docker {
+    name 'scalarlabs/kelpie'
+    files tasks.distTar.outputs
 }
 
 sourceCompatibility = 1.8
