@@ -46,6 +46,8 @@ public abstract class TimeBasedProcessor extends Processor {
    * Execute an operation. This method is invoked repeatedly in {@link #execute()} for {@code
    * run_for_sec}. If a failure which you don't want to record its latency happens, this method
    * should throw an exception. The exception will be caught in {@link #execute()}.
+   *
+   * @throws Exception This exception will be caught in {@link #execute()}
    */
   protected abstract void executeEach() throws Exception;
 }
