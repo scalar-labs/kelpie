@@ -180,6 +180,8 @@ public class FrequencyBasedPrintProcessor extends FrequencyBasedProcessor {
 }
 ```
 
+You can make the job fail by throwing `ProcessFatalException` when a fatal error happens in `executeEach()`.
+
 ## PostProcessor
 `PostProcessor` executes the last process in a job after all `Processor#execute()` finish. For example, if it is verifying database consistency, `PostProcessor` reads all the records of the database and checks if their values are as expected. `PostProcessor#execute()` is always executed with a single thread.
 
