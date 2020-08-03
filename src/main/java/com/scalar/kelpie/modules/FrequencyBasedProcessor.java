@@ -1,6 +1,7 @@
 package com.scalar.kelpie.modules;
 
 import com.scalar.kelpie.config.Config;
+import com.scalar.kelpie.exception.ProcessFatalException;
 import com.scalar.kelpie.stats.Stats;
 import java.util.function.Supplier;
 import java.util.stream.LongStream;
@@ -20,6 +21,8 @@ public abstract class FrequencyBasedProcessor extends Processor {
           try {
             executeEach();
             return true;
+          } catch (ProcessFatalException e) {
+            throw e;
           } catch (Exception e) {
             return false;
           }
