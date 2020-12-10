@@ -349,6 +349,9 @@ To get each statistics information in your test, you get `Stats` instance from a
 ## Realtime reporting
 When you set `realtime_report_enabled` of `[stats]` true in your config file, Kelpie outputs the throughput and the total number of operations at that time while your test is running.
 
+## Latency log
+Kelpie can output the latency of a request with the current time to the logs when you set `latency_log_enabled` of `[stats]` true in your config file.
+
 # Config
 A config is a TOML-formatted file where you can define what modules and static variables to use in your test.
 A config file consists of at least a table `[modules]`. `[commmon]` is optional, but it is useful for your test.

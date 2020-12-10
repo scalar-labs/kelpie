@@ -31,6 +31,7 @@ public class Config {
 
   private long significantDigits = 3L;
   private boolean realtimeReportEnabled = false;
+  private boolean latencyLogEnabled = false;
 
   private long concurrency = 1L;
   private long runForSec = 60L;
@@ -246,6 +247,15 @@ public class Config {
    */
   public boolean isRealtimeReportEnabled() {
     return realtimeReportEnabled;
+  }
+
+  /**
+   * Returns true if output of each latency is enabled
+   *
+   * @return true if output of each latency is enabled
+   */
+  public boolean isLatencyLogEnabled() {
+    return latencyLogEnabled;
   }
 
   /**
@@ -493,6 +503,10 @@ public class Config {
 
     if (stats.getLong("significant_digits") != null) {
       significantDigits = stats.getLong("significant_digits");
+    }
+
+    if (stats.getBoolean("latency_log_enabled") != null) {
+      latencyLogEnabled = stats.getBoolean("latency_log_enabled");
     }
   }
 }
