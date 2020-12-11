@@ -39,7 +39,7 @@ public class Stats {
   public void recordLatency(long latencyMillis) {
     histogram.recordValue(latencyMillis);
     if (config.isLatencyLogEnabled()) {
-      logger.info(System.currentTimeMillis() + " " + latencyMillis);
+      logger.info("[Latency] " + System.currentTimeMillis() + " " + latencyMillis);
     }
   }
 
