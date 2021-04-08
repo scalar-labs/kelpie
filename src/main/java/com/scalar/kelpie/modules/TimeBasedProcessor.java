@@ -23,6 +23,7 @@ public abstract class TimeBasedProcessor extends Processor {
           } catch (ProcessFatalException e) {
             throw e;
           } catch (Exception e) {
+            logError("An error occurred during executing the processor.", e);
             return false;
           }
         };
