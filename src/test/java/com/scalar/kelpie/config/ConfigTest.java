@@ -16,7 +16,7 @@ public class ConfigTest {
   static final String ANY_INJECTOR1_PATH = "/path/to/Injectro1";
   static final String ANY_INJECTOR2_NAME = "my.Injector2";
   static final String ANY_INJECTOR2_PATH = "/path/to/Injector2";
-  static final String ANY_INECTION_EXECUTOR = "com.scalar.kelpie.executor.Test";
+  static final String ANY_INJECTION_EXECUTOR = "com.scalar.kelpie.executor.Test";
   static final long ANY_CONCURRENCY = 8L;
   static final String MY_CONFIG_TABLE = "my_config";
   static final String WRONG_CONFIG_TABLE = "no_config";
@@ -168,13 +168,13 @@ public class ConfigTest {
   public void getInjectionExecutor_ShouldGetProperly() {
     // Arrange
     Config config =
-        new Config("[common]\n" + "injection_executor = \"" + ANY_INECTION_EXECUTOR + "\"");
+        new Config("[common]\n" + "injection_executor = \"" + ANY_INJECTION_EXECUTOR + "\"");
 
     // Act
     String executor = config.getInjectionExecutor().get();
 
     // Assert
-    assertThat(executor).isEqualTo(ANY_INECTION_EXECUTOR);
+    assertThat(executor).isEqualTo(ANY_INJECTION_EXECUTOR);
   }
 
   @Test
@@ -286,6 +286,42 @@ public class ConfigTest {
               config.getUserString(MY_CONFIG_TABLE, WRONG_PARAMETER);
             })
         .isInstanceOf(IllegalConfigException.class);
+  }
+
+  @Test
+  public void hasUserValue_ExistingParameterGiven_ShouldReturnTrue() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean actual = config.hasUserValue(MY_CONFIG_TABLE, LONG_PARAMETER);
+
+    // Assert
+    assertThat(actual).isTrue();
+  }
+
+  @Test
+  public void hasUserValue_NonExistingTableGiven_ShouldReturnFalse() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean actual = config.hasUserValue(WRONG_PARAMETER, LONG_PARAMETER);
+
+    // Assert
+    assertThat(actual).isFalse();
+  }
+
+  @Test
+  public void hasUserValue_NonExistingParameterGiven_ShouldReturnFalse() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean actual = config.hasUserValue(MY_CONFIG_TABLE, WRONG_PARAMETER);
+
+    // Assert
+    assertThat(actual).isFalse();
   }
 
   @Test
