@@ -420,6 +420,20 @@ public class Config {
     }
   }
 
+  /**
+   * Returns whether it has the specified user defined value.
+   *
+   * @param table a table name to specify the variable
+   * @param name a variable name
+   * @return whether it has the specified user defined value
+   */
+  public boolean hasUserValue(String table, String name) {
+    if (!toml.containsTable(table)) {
+      return false;
+    }
+    return toml.getTable(table).contains(name);
+  }
+
   private Toml getTable(String table) {
     Toml t = toml.getTable(table);
     if (t == null) {
