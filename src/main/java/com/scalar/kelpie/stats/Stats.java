@@ -2,7 +2,7 @@ package com.scalar.kelpie.stats;
 
 import com.scalar.kelpie.config.Config;
 import java.math.BigDecimal;
-import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import org.HdrHistogram.ConcurrentHistogram;
@@ -160,7 +160,7 @@ public class Stats {
 
   private double round(double v) {
     return new BigDecimal(v)
-        .round(new MathContext((int) config.getSignificantDigits()))
+        .setScale((int) config.getSignificantDigits(), RoundingMode.HALF_UP)
         .doubleValue();
   }
 
