@@ -14,7 +14,7 @@ import picocli.CommandLine;
     description = "Execute a job built with Kelpie framework.",
     name = "kelpie",
     mixinStandardHelpOptions = true,
-    version = "kelpie 1.2.0")
+    version = "kelpie 1.2.1")
 public class Kelpie implements Callable {
   private static final Logger LOGGER = LoggerFactory.getLogger(Kelpie.class);
 
