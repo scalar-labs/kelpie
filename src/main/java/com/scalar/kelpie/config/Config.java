@@ -38,6 +38,7 @@ public class Config {
   private long rampForSec = 0L;
   private long numOperations = 0L;
   private long numOperationsForRampUp = 0L;
+  private boolean logEnabledWhenError;
 
   /**
    * Constructs a {@code Config} with toml format text.
@@ -193,6 +194,15 @@ public class Config {
    */
   public Optional<String> getInjectionExecutor() {
     return injectionExecutor;
+  }
+
+  /**
+   * Returns whether log when an error happens while executing the processor.
+   *
+   * @return whether log when an error happens while executing the processor
+   */
+  public boolean isLogEnabledWhenError() {
+    return logEnabledWhenError;
   }
 
   /**
@@ -502,6 +512,11 @@ public class Config {
       injectionExecutor = Optional.of(common.getString("injection_executor"));
     } else {
       injectionExecutor = Optional.of(DEFAULT_INJECTION_EXECUTOR);
+    }
+    if (common.getBoolean("log_enabled_when_error") != null) {
+      logEnabledWhenError = common.getBoolean("log_enabled_when_error");
+    } else {
+      logEnabledWhenError = true;
     }
   }
 
