@@ -61,6 +61,7 @@ public class ConfigTest {
           + "  concurrency = "
           + ANY_CONCURRENCY
           + "\n"
+          + "  log_enabled_when_error = false\n"
           + "["
           + MY_CONFIG_TABLE
           + "]\n"
@@ -150,6 +151,18 @@ public class ConfigTest {
 
     // Assert
     assertThat(runForSec).isEqualTo(DEFAULT_RUN_FOR_SEC);
+  }
+
+  @Test
+  public void isLogEnabledWhenError_ShouldGetProperly() {
+    // Arrange
+    Config config = new Config(tomlText);
+
+    // Act
+    boolean logEnabledWhenError = config.isLogEnabledWhenError();
+
+    // Assert
+    assertThat(logEnabledWhenError).isFalse();
   }
 
   @Test

@@ -24,7 +24,9 @@ public abstract class FrequencyBasedProcessor extends Processor {
           } catch (ProcessFatalException e) {
             throw e;
           } catch (Exception e) {
-            logError("An error occurred during executing the processor.", e);
+            if (config.isLogEnabledWhenError()) {
+              logError("An error occurred during executing the processor.", e);
+            }
             return false;
           }
         };
