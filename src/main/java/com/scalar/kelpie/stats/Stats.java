@@ -127,8 +127,10 @@ public class Stats {
    *
    * @return a summary of the statistics
    */
-  public String getSummary() {
-    return "==== Statistics Summary ====\n"
+  public void getSummary() {
+
+    logger.info(
+        "==== Statistics Summary ====\n"
         + "Throughput: "
         + getThroughput(config.getRunForSec())
         + " ops\n"
@@ -155,7 +157,7 @@ public class Stats {
         + " ms\n"
         + "Latency at 99 percentile: "
         + getLatencyAtPercentile(99.0)
-        + " ms\n";
+        + " ms\n");
   }
 
   private double round(double v) {

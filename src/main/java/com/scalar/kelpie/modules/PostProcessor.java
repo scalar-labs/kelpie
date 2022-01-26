@@ -37,6 +37,6 @@ public abstract class PostProcessor extends Module {
       return;
     }
 
-    logInfo(stats.getSummary());
+    stats.getSummary();
   }
 }
