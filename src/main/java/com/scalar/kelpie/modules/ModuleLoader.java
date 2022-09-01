@@ -6,6 +6,7 @@ import com.scalar.kelpie.modules.dummy.DummyPostProcessor;
 import com.scalar.kelpie.modules.dummy.DummyPreProcessor;
 import com.scalar.kelpie.modules.dummy.DummyProcessor;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -66,12 +67,16 @@ public class ModuleLoader {
 
   private Module loadModule(String className, String jarPath) throws ModuleLoadException {
     try {
-      URL[] urls = new URL[] {new File(jarPath).toURI().toURL()};
-      ClassLoader loader = URLClassLoader.newInstance(urls, getClass().getClassLoader());
-      Class<Module> clazz = (Class<Module>) Class.forName(className, true, loader);
-      Class[] types = {Config.class};
-      Object[] args = {config};
+      URLClassLoader classLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
+      URL jarUrl = new File(jarPath).toURI().toURL();
+      Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+      method.setAccessible(true);
+      method.invoke(classLoader, jarUrl);
 
+      @SuppressWarnings("unchecked")
+      Class<Module> clazz = (Class<Module>) Class.forName(className, true, classLoader);
+      Class<?>[] types = {Config.class};
+      Object[] args = {config};
       return clazz.getConstructor(types).newInstance(args);
     } catch (Exception e) {
       throw new ModuleLoadException("Failed to load a module " + className + " from " + jarPath, e);
