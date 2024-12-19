@@ -6,8 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Build
-    matrix:
-      java_version: [8, 11, 17, 21]
+    strategy:
+      matrix:
+        java_version: [8, 11, 17, 21]
     steps:
     - uses: actions/checkout@v4
 
