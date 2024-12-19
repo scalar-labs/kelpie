@@ -44,4 +44,4 @@ jobs:
 
     - name: Execute Kelpie-Test:print-modules
       working-directory: kelpie-test
-      run: ${{ github.workspace }}/build/libs/bin/kelpie --config print-modules/config.toml
+      run: ${{ github.workspace }}/build/install/kelpie/bin/kelpie --config print-modules/config.toml
