@@ -67,11 +67,9 @@ public class ModuleLoader {
 
   private Module loadModule(String className, String jarPath) throws ModuleLoadException {
     try {
-      URLClassLoader classLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
       URL jarUrl = new File(jarPath).toURI().toURL();
-      Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-      method.setAccessible(true);
-      method.invoke(classLoader, jarUrl);
+      URLClassLoader classLoader = new URLClassLoader(new URL[] { jarUrl }, Thread.currentThread().getContextClassLoader());
+      Thread.currentThread().setContextClassLoader(classLoader);
 
       @SuppressWarnings("unchecked")
       Class<Module> clazz = (Class<Module>) Class.forName(className, true, classLoader);
