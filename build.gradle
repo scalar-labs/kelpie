@@ -23,15 +23,11 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
 }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
