@@ -8,8 +8,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-          # java_version: [8, 11, 17, 21]
-        java_version: [8]
+        java_version: [8, 11, 17, 21]
     steps:
     - uses: actions/checkout@v4
 
@@ -44,7 +43,7 @@ jobs:
 
     - name: Build Kelpie-Test:print-modules
       working-directory: kelpie-test/print-modules
-      run: ${{ github.workspace }}/gradlew shadowJar
+      run: gradlew shadowJar
 
     - name: Execute Kelpie-Test:print-modules
       working-directory: kelpie-test
