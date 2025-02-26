@@ -1,55 +1,50 @@
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'Kelpie'
-                packaging 'jar'
-                // optionally artifactId can be defined here 
-                description 'A simple yet general framework for running end-to-end testing.'
-                url 'https://github.com/scalar-labs/kelpie'
-
-                scm {
-                    connection 'scm:git:https://github.com/scalar-labs/kelpie.git'
-                    developerConnection 'scm:git:https://github.com/scalar-labs/kelpie.git'
-                    url 'https://github.com/scalar-labs/kelpie'
-                }
-
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'Kelpie'
+            from components.java
+            pom {
+                name = 'Kelpie'
+                description = 'A simple yet general framework for running end-to-end testing.'
+                url = 'https://github.com/scalar-labs/kelpie'
                 licenses {
                     license {
-                        name 'Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0'
+                        name = 'Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0'
                     }
                 }
-
                 developers {
                     developer {
-                        id 'yuji'
-                        name 'Yuji Ito'
-                        email 'yuji.ito@scalar-labs.com'
+                        id = 'yuji'
+                        name = 'Yuji Ito'
+                        email = 'yuji.ito@scalar-labs.com'
                     }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/scalar-labs/kelpie.git'
+                    developerConnection = 'scm:git:https://github.com/scalar-labs/kelpie.git'
+                    url = 'https://github.com/scalar-labs/kelpie'
                 }
             }
         }
     }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = project.properties['ossrhUsername'] ?: ""
+                password = project.properties['ossrhPassword'] ?: ""
+            }
+        }
+    }
+}
+
+signing {
+    required { project.gradle.taskGraph.hasTask("publish") }
+    sign publishing.publications.mavenJava
 }
