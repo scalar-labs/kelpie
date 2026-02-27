@@ -7,6 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** SequentialInjectionExecutor executes each {@link Injector} one by one. */
 public class SequentialInjectionExecutor extends InjectionExecutor {
 
+  /**
+   * Creates a SequentialInjectionExecutor.
+   *
+   * @param injectors list of injectors
+   */
   public SequentialInjectionExecutor(List<Injector> injectors) {
     super(injectors);
   }

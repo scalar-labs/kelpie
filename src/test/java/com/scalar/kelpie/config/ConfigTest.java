@@ -7,7 +7,7 @@ import com.scalar.kelpie.exception.IllegalConfigException;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ConfigTest {
   static final String ANY_PRE_NAME = "my.PreProcessor";

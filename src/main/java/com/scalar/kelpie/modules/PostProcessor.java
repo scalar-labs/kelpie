@@ -7,10 +7,18 @@ import com.scalar.kelpie.stats.Stats;
 public abstract class PostProcessor extends Module {
   private Stats stats;
 
+  /**
+   * Creates a PostProcessor.
+   *
+   * @param config configuration object
+   */
   public PostProcessor(Config config) {
     super(config);
   }
 
+  /**
+   * Executes PostProcessor
+   */
   public abstract void execute();
 
   /**

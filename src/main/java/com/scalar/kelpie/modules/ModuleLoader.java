@@ -19,10 +19,20 @@ import java.util.List;
 public class ModuleLoader {
   private Config config;
 
+  /**
+   * Creates a ModuleLoader.
+   *
+   * @param config configuration object
+   */
   public ModuleLoader(Config config) {
     this.config = config;
   }
 
+  /**
+   * Loads a PreProcessor object
+   * @return PreProcessor object
+   * @throws ModuleLoadException object
+   */
   public PreProcessor loadPreProcessor() throws ModuleLoadException {
     if (config.isPreProcessorEnabled()) {
       return (PreProcessor)
@@ -32,6 +42,11 @@ public class ModuleLoader {
     }
   }
 
+  /**
+   * Loads a Processor object
+   * @return Processor object
+   * @throws ModuleLoadException object
+   */
   public Processor loadProcessor() throws ModuleLoadException {
     if (config.isProcessorEnabled()) {
       return (Processor)
@@ -41,6 +56,11 @@ public class ModuleLoader {
     }
   }
 
+  /**
+   * Loads a PostProcessor object
+   * @return PostProcessor object
+   * @throws ModuleLoadException object
+   */
   public PostProcessor loadPostProcessor() throws ModuleLoadException {
     if (config.isPostProcessorEnabled()) {
       return (PostProcessor)
@@ -50,7 +70,20 @@ public class ModuleLoader {
     }
   }
 
-  public List<Injector> loadInjectors() throws ModuleLoadException {
+/**
+ * Loads and initializes all configured {@link Injector} modules.
+ *
+ * <p>If injector support is enabled in the configuration, this method
+ * iterates through the configured injector definitions, dynamically
+ * loads each module, and returns them as a list.</p>
+ *
+ * <p>If injectors are disabled, an empty list is returned.</p>
+ *
+ * @return a list of successfully loaded {@link Injector} instances;
+ *         never {@code null}
+ * @throws ModuleLoadException if any configured injector module
+ */
+public List<Injector> loadInjectors() throws ModuleLoadException {
     List<Injector> injectors = new ArrayList<>();
 
     if (config.isInjectorEnabled()) {

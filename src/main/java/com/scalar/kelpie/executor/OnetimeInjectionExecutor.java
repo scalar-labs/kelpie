@@ -11,6 +11,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** OnetimeInjectionExecutor executes all {@link Injector}s once. */
 public class OnetimeInjectionExecutor extends InjectionExecutor {
 
+  /**
+   * Creates a OnetimeInjectionExecutor.
+   *
+   * @param injectors list of injectors
+   */
   public OnetimeInjectionExecutor(List<Injector> injectors) {
     super(injectors);
   }

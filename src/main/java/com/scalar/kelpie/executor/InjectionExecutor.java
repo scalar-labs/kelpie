@@ -11,8 +11,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * InjectionExecutor}.
  */
 public abstract class InjectionExecutor {
+  /** list of injectors */
   protected List<Injector> injectors;
 
+  /**
+   * Creates a InjectionExecutor.
+   *
+   * @param injectors list of injectors
+   */
   public InjectionExecutor(List<Injector> injectors) {
     this.injectors = injectors;
   }

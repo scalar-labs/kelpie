@@ -6,6 +6,11 @@ import com.scalar.kelpie.modules.PostProcessor;
 /** DummyPostProcessor is a dummy module of {@link PostProcessor} and executes nothing. */
 public class DummyPostProcessor extends PostProcessor {
 
+  /**
+   * Creates a DummyPostProcessor.
+   *
+   * @param config configuration object
+   */
   public DummyPostProcessor(Config config) {
     super(config);
   }

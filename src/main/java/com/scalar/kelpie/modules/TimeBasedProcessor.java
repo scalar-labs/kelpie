@@ -7,6 +7,12 @@ import java.util.function.Supplier;
 
 /** TimeBasedProcessor executes operations for the configured time. */
 public abstract class TimeBasedProcessor extends Processor {
+
+  /**
+   * Creates a TimeBasedProcessor.
+   *
+   * @param config configuration object
+   */
   public TimeBasedProcessor(Config config) {
     super(config);
   }

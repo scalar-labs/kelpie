@@ -29,6 +29,15 @@ public class KelpieExecutor {
   private final AtomicBoolean isDone;
   private final Stats stats;
 
+  /**
+   * Creates a KelpieExecutor.
+   *
+   * @param config configuration object
+   * @param preProcessor preprocessor object
+   * @param  processor processor object
+   * @param postProcessor postprocessor object
+   * @param injectors list of injectors
+   */
   @Inject
   public KelpieExecutor(
       Config config,
@@ -46,6 +55,9 @@ public class KelpieExecutor {
     this.stats = new Stats(config);
   }
 
+  /**
+   * Executes the kelpie executor
+   */
   public void execute() {
     processor.setStats(stats);
     postProcessor.setStats(stats);
@@ -119,11 +131,12 @@ public class KelpieExecutor {
   private InjectionExecutor loadInjectionExecutor() {
     String name = config.getInjectionExecutor().get();
     try {
-      Class clazz = Class.forName(name);
-      Class[] types = {List.class};
-      Object[] args = {injectors};
+      Class<? extends InjectionExecutor> clazz =
+              Class.forName(name).asSubclass(InjectionExecutor.class);
 
-      return (InjectionExecutor) clazz.getConstructor(types).newInstance(args);
+      return clazz
+              .getConstructor(List.class)
+              .newInstance(injectors);
     } catch (Exception e) {
       throw new InjectionException("Failed to load InjectionExecutor " + name, e);
     }

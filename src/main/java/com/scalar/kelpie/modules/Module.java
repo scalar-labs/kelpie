@@ -7,9 +7,19 @@ import org.slf4j.LoggerFactory;
 
 /** A Module abstraction to execute tasks. */
 public abstract class Module implements AutoCloseable {
+
+  /**
+   * The default state represented as an empty {@link JsonObject}.
+   *
+   * <p>This constant is used as the initial or fallback state when
+   * no explicit state is provided.</p>
+   */
   protected static final JsonObject DEFAULT_STATE = JsonObject.EMPTY_JSON_OBJECT;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  /**
+   * configuration object
+   */
   protected Config config;
   private JsonObject state;
   private JsonObject previousState;

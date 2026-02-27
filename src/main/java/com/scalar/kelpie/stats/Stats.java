@@ -164,9 +164,25 @@ public class Stats {
         .doubleValue();
   }
 
+  /**
+   * A {@link Runnable} implementation that periodically reports
+   * real-time throughput and execution statistics.
+   *
+   * <p>This reporter runs in a background thread and logs the
+   * current throughput (operations per second), along with total
+   * success and failure counts, at fixed time intervals.</p>
+   *
+   * <p>The reporting loop continues until the provided
+   * {@link AtomicBoolean} flag is set to {@code true}.</p>
+   */
   public class RealtimeReport implements Runnable {
     private AtomicBoolean isDone;
 
+    /**
+     * Creates a RealtimeReport
+     *
+     * @param isDone boolean flag to indicate process is done
+     */
     public RealtimeReport(AtomicBoolean isDone) {
       this.isDone = isDone;
     }

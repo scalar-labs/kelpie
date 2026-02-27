@@ -9,6 +9,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RandomInjectionExecutor extends InjectionExecutor {
   private final Random random;
 
+  /**
+   * Creates a RandomInjectionExecutor.
+   *
+   * @param injectors list of injectors
+   */
   public RandomInjectionExecutor(List<Injector> injectors) {
     super(injectors);
     this.random = new Random(System.currentTimeMillis());

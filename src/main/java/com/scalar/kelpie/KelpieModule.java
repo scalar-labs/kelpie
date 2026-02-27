@@ -11,10 +11,18 @@ import com.scalar.kelpie.modules.PreProcessor;
 import com.scalar.kelpie.modules.Processor;
 import java.util.List;
 
+/**
+ * Kelpie module to set up and load processors
+ */
 public class KelpieModule extends AbstractModule {
   private final Config config;
   private final ModuleLoader loader;
 
+  /**
+   * Creates a KelpieModule.
+   *
+   * @param config configuration object
+   */
   public KelpieModule(Config config) {
     this.config = config;
     this.loader = new ModuleLoader(config);

@@ -6,11 +6,19 @@ import com.scalar.kelpie.stats.Stats;
 /** Processor executes operations. */
 public abstract class Processor extends Module {
   private Stats stats;
+  /**
+   * Creates a Processor.
+   *
+   * @param config configuration object
+   */
 
   public Processor(Config config) {
     super(config);
   }
 
+  /**
+   * Executes Processor
+   */
   public abstract void execute();
 
   /**
@@ -82,6 +90,6 @@ public abstract class Processor extends Module {
   }
 
   private String prependThreadId(String message) {
-    return "[Thread " + Thread.currentThread().getId() + "] " + message;
+    return "[Thread " + Thread.currentThread().threadId() + "] " + message;
   }
 }

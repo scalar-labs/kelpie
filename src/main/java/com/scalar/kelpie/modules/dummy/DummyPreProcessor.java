@@ -6,6 +6,11 @@ import com.scalar.kelpie.modules.PreProcessor;
 /** DummyPreProcessor is a dummy module of {@link PreProcessor} and executes nothing. */
 public class DummyPreProcessor extends PreProcessor {
 
+  /**
+   * Creates a DummyPreProcessor.
+   *
+   * @param config configuration object
+   */
   public DummyPreProcessor(Config config) {
     super(config);
   }
