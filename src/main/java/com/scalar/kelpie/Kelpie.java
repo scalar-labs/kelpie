@@ -10,9 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-/**
- * To execute kelpie jobs built with kelpie framework
- */
+/** To execute kelpie jobs built with kelpie framework */
 @CommandLine.Command(
     description = "Execute a job built with Kelpie framework.",
     name = "kelpie",
@@ -70,17 +68,14 @@ public class Kelpie implements Callable {
       description = "Execute the injectors")
   private boolean injected = false;
 
-  /**
-   * Creates a new instance of {@code Kelpie}.
-   */
-  public Kelpie() {
-  }
-
+  /** Creates a new instance of {@code Kelpie}. */
+  public Kelpie() {}
 
   /**
-   *  The entry point of the application.
-   * @param args command-line arguments passed to the application.
-   *  *             The array may be empty but is never {@code null}.
+   * The entry point of the application.
+   *
+   * @param args command-line arguments passed to the application. The array may be empty but is
+   *     never {@code null}.
    */
   public static void main(String[] args) {
     int exitCode = new CommandLine(new Kelpie()).execute(args);

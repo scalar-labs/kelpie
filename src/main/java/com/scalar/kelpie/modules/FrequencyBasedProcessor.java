@@ -9,10 +9,10 @@ import java.util.stream.LongStream;
 /** FrequencyBasedProcessor executes operations by the configured count. */
 public abstract class FrequencyBasedProcessor extends Processor {
   /**
-    * Creates a FrequencyBasedProcessor.
-    *
-    * @param config configuration object
-  */
+   * Creates a FrequencyBasedProcessor.
+   *
+   * @param config configuration object
+   */
   public FrequencyBasedProcessor(Config config) {
     super(config);
   }
