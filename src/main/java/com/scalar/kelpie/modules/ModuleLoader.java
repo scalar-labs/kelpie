@@ -29,9 +29,9 @@ public class ModuleLoader {
   }
 
   /**
-   * Loads a PreProcessor object
-   * @return PreProcessor object
-   * @throws ModuleLoadException object
+   * Loads the pre-processor module specified in the configuration.
+   * @return the loaded {@link PreProcessor}
+   * @throws ModuleLoadException if the module fails to load
    */
   public PreProcessor loadPreProcessor() throws ModuleLoadException {
     if (config.isPreProcessorEnabled()) {

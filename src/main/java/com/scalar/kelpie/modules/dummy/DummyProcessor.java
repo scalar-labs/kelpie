@@ -10,7 +10,7 @@ public class DummyProcessor extends Processor {
    * Creates a DummyProcessor.
    *
    * @param config configuration object
-  */
+   */
   public DummyProcessor(Config config) {
     super(config);
   }
