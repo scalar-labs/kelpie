@@ -43,7 +43,10 @@ jobs:
 
     - name: Build Kelpie-Test:print-modules
       working-directory: kelpie-test/print-modules
-      run: gradle shadowJar
+      run: |
+        touch settings.gradle
+        ./gradlew shadowJar
+        
 
     - name: Execute Kelpie-Test:print-modules
       working-directory: kelpie-test
