@@ -39,14 +39,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: scalar-labs/kelpie-test
+        ref: jishnu/feat/print-module-updates
         path: kelpie-test
 
     - name: Build Kelpie-Test:print-modules
       working-directory: kelpie-test/print-modules
-      run: |
-        touch settings.gradle
-        ./gradlew shadowJar
-        
+      run: ./gradlew shadowJar
 
     - name: Execute Kelpie-Test:print-modules
       working-directory: kelpie-test
