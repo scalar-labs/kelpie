@@ -1,10 +1,9 @@
 apply plugin: 'maven-publish'
-apply plugin: 'signing'
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = 'Kelpie'
+            artifactId = 'kelpie'
             from components.java
             pom {
                 name = 'Kelpie'
@@ -31,20 +30,39 @@ publishing {
             }
         }
     }
+
     repositories {
         maven {
-            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username = project.properties['ossrhUsername'] ?: ""
-                password = project.properties['ossrhPassword'] ?: ""
+            name = "staging"
+            url = layout.buildDirectory.dir("staging-deploy")
+        }
+    }
+
+}
+
+jreleaser {
+    project {
+        name = 'Kelpie'
+        description = 'A simple yet general framework for running end-to-end testing.'
+        copyright = '2026 Scalar Labs'
+    }
+
+    signing {
+        active = 'ALWAYS'
+        armored = true
+        mode = System.getenv('CI') ? 'MEMORY' : 'COMMAND'
+
+    }
+
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'RELEASE'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
             }
         }
     }
-}
-
-signing {
-    required { project.gradle.taskGraph.hasTask("publish") }
-    sign publishing.publications.mavenJava
 }
