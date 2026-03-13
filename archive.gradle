@@ -47,6 +47,8 @@ jreleaser {
         copyright = "2026 Scalar Labs"
     }
 
+    gitRootSearch = true
+
     signing {
         active = 'ALWAYS'
         armored = true
