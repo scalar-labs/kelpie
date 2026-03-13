@@ -44,7 +44,7 @@ jreleaser {
     project {
         name = 'Kelpie'
         description = 'A simple yet general framework for running end-to-end testing.'
-        copyright = "${new Date().format('yyyy')} Scalar Labs"
+        copyright = "2026 Scalar Labs"
     }
 
     signing {
