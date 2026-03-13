@@ -41,11 +41,7 @@ publishing {
 }
 
 jreleaser {
-    project {
-        name = 'Kelpie'
-        description = 'A simple yet general framework for running end-to-end testing.'
-        copyright = '2026 Scalar Labs'
-    }
+    gitRootSearch = true
 
     signing {
         active = 'ALWAYS'
