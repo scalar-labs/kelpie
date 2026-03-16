@@ -39,8 +39,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: scalar-labs/kelpie-test
-        # To be removed in final commit
-        ref: jishnu/feat/print-module-updates
         path: kelpie-test
 
     - name: Build Kelpie-Test:print-modules
