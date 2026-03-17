@@ -1,6 +1,10 @@
 name: Kelpie
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -43,7 +47,7 @@ jobs:
 
     - name: Build Kelpie-Test:print-modules
       working-directory: kelpie-test/print-modules
-      run: gradle shadowJar
+      run: ./gradlew shadowJar
 
     - name: Execute Kelpie-Test:print-modules
       working-directory: kelpie-test
