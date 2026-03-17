@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set version
         id: version
@@ -39,3 +39,13 @@ jobs:
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.MAVEN_CENTRAL_GPG_PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.MAVEN_CENTRAL_GPG_SECRET_KEY }}
         run: ./gradlew jreleaserDeploy
+
+      - name: Upload JReleaser outputs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jreleaser-release
+          path: |
+            build/jreleaser/trace.log
+            build/jreleaser/output.properties  
+      

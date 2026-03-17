@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.jreleaser' version '1.13.1'
+    id 'org.jreleaser' version '1.23.0'
 }
 
 application {
