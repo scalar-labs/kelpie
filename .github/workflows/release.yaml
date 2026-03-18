@@ -29,7 +29,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Build artifacts
-        run: ./gradlew publish -PreleaseVersion=${{ steps.version.outputs.version }}
+        run: ./gradlew publish
 
       - name: Deploy with JReleaser
         env:
