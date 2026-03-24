@@ -1,9 +1,12 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.jreleaser' version '1.23.0'
 }
 
-mainClassName = 'com.scalar.kelpie.Kelpie'
+application {
+    mainClass = 'com.scalar.kelpie.Kelpie'
+}
 
 repositories {
     mavenCentral()
@@ -32,9 +35,7 @@ java {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "com.scalar-labs"
-archivesBaseName = "kelpie"
-//version = "1.2.4"
+group = 'com.scalar-labs'
+version = '1.2.5-SNAPSHOT'
 
-// for archiving and uploading to maven central
-//apply from: 'archive.gradle'
+apply from: 'archive.gradle'
