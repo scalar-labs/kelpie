@@ -36,6 +36,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'com.scalar-labs'
-version = '1.2.5-SNAPSHOT'
+version = '1.2.4'
 
 apply from: 'archive.gradle'
